@@ -31,3 +31,4 @@ No environment variables are required. Optional:
 ## Deploying
 
 Pushing to the default branch deploys to production via the Vercel Git integration.
+
