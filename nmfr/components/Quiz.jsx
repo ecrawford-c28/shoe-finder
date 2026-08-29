@@ -191,6 +191,12 @@ function ShoeCard({ entry, rank, size, clearWinner }) {
           </>
         )}
       </div>
+      {s.status === 'outgoing' ? (
+        <p className="outgoing">
+          Last year&apos;s model. Same shoe as the current version in all but the details, and
+          usually heavily discounted.
+        </p>
+      ) : null}
       {deal ? (
         <p className="deal">
           {deal.percent ? `${deal.percent}% off ` : 'Discount '}with code <b>{deal.code}</b>, applied

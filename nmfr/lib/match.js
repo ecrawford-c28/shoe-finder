@@ -354,19 +354,40 @@ export function scoreShoes(shoes, a, limit = 5) {
 
   scored.sort((x, y) => y.score - x.score);
 
-  // Keep the top list varied: no more than two shoes from the same brand.
+  // Keep the top list varied: no more than two shoes from the same brand, and
+  // never two versions of the same shoe. Offering someone the Guide 18 and the
+  // Guide 19 side by side is not a choice, it is the same shoe twice, so only
+  // the better scoring version of a family survives. Whose turn that is falls
+  // out of the scoring on its own: a tight budget lifts last year's cheaper
+  // version, a loose one lifts the current model.
   const brandCount = {};
+  const seenFamily = new Set();
   const picked = [];
   for (const s of scored) {
     if (s.score < 0) continue;
+    const fam = s.shoe.family;
+    if (fam && seenFamily.has(fam)) continue;
     const n = brandCount[s.shoe.brand] || 0;
     if (n >= 2) continue;
+    if (fam) seenFamily.add(fam);
     brandCount[s.shoe.brand] = n + 1;
     picked.push(s);
     if (picked.length >= limit) break;
   }
   // If filters were brutal, fall back to the raw ranking so we always answer.
-  if (picked.length < 3) return scored.slice(0, limit);
+  // Deduplicate families there too, otherwise the emergency path is the one
+  // place a shoe could appear twice.
+  if (picked.length < 3) {
+    const fams = new Set();
+    return scored
+      .filter(s => {
+        if (!s.shoe.family) return true;
+        if (fams.has(s.shoe.family)) return false;
+        fams.add(s.shoe.family);
+        return true;
+      })
+      .slice(0, limit);
+  }
   return picked;
 }
 

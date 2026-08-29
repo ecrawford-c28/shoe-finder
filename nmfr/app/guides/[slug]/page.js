@@ -105,10 +105,14 @@ export default async function Guide({ params }) {
             </h3>
             <p className="guide-specs">
               £{Number(shoe.rrp_gbp).toFixed(2).replace('.00', '')} · {CAT[shoe.category] || shoe.category} ·{' '}
-              {shoe.weight_g}g · {shoe.drop_mm}mm drop · {shoe.stack_heel_mm}mm stack
+              {shoe.weight_g}g · {shoe.drop_mm}mm drop
+              {shoe.stack_heel_mm ? ` · ${shoe.stack_heel_mm}mm stack` : ''}
               {shoe.widths.includes('extra_wide') ? ' · 4E available' : shoe.widths.includes('wide') ? ' · wide fitting' : ''}
               {shoe.plate !== 'none' ? ` · ${shoe.plate} plate` : ''}
             </p>
+            {shoe.status === 'outgoing' ? (
+              <p className="outgoing">Last year&apos;s model, usually heavily discounted.</p>
+            ) : null}
             {shoe.one_liner && <p>{shoe.one_liner}</p>}
             {reasons.length > 0 && (
               <ul>

@@ -70,6 +70,9 @@ function rowsToShoes(rows) {
       review_url: (o.review_url || '').trim(),
       one_liner: (o.one_liner || '').trim(),
       status: (o.status || 'current').trim().toLowerCase(),
+      // Groups a shoe with its own earlier or later versions, so the quiz never
+      // offers someone the Guide 18 and the Guide 19 as two separate choices.
+      family: (o.family || '').trim().toLowerCase(),
     };
   }).filter(Boolean).filter(s => s.status !== 'hidden' && s.status !== 'superseded');
 }
