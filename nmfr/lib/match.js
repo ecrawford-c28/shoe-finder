@@ -161,7 +161,39 @@ export function discountInfo(shoe) {
   };
 }
 
-export function scoreShoes(shoes, a, limit = 5) {
+// The one thing that makes last season's version worth buying is that it is
+// heavily discounted, and the sheet only knows RRP, so the scoring cannot see
+// it. These two helpers put that back in front of people without inventing a
+// price: we say the cheaper version exists and let them go and look.
+
+// The outgoing version of the same shoe. No price test here on purpose: brands
+// often hold RRP flat between generations, so RRP says nothing useful about
+// what last season's costs today. What we can honestly say is that it is last
+// year's model and those get discounted, so we say only that and let people go
+// and look at the real price.
+function cheaperSiblingOf(shoe, shoes) {
+  if (!shoe.family) return null;
+  return (
+    shoes.find(
+      s =>
+        s.family === shoe.family &&
+        s.id !== shoe.id &&
+        s.status === 'outgoing'
+    ) || null
+  );
+}
+
+// How far behind the shoe it would replace a value pick is allowed to be.
+// Measured across a sample of personas: a gap of 8 keeps the swap to shoes that
+// are genuinely close, since the median outgoing candidate sits 26 points back
+// and a purpose match alone is worth 30.
+const VALUE_PICK_MAX_GAP = 8;
+
+// A saving has to be worth telling someone about. Without this, a shoe one
+// penny cheaper qualified as the best value option, which is daft.
+const MIN_SAVING_GBP = 10;
+
+export function scoreShoes(shoes, a, limit = 5, opts = {}) {
   const budget = parseFloat(a.budget || '9999');
   const avoid = new Set(a.avoid || []);
   const liked = new Set(a.liked || []);
@@ -379,16 +411,47 @@ export function scoreShoes(shoes, a, limit = 5) {
   // place a shoe could appear twice.
   if (picked.length < 3) {
     const fams = new Set();
-    return scored
-      .filter(s => {
-        if (!s.shoe.family) return true;
-        if (fams.has(s.shoe.family)) return false;
-        fams.add(s.shoe.family);
-        return true;
-      })
-      .slice(0, limit);
+    return withSiblings(
+      scored
+        .filter(s => {
+          if (!s.shoe.family) return true;
+          if (fams.has(s.shoe.family)) return false;
+          fams.add(s.shoe.family);
+          return true;
+        })
+        .slice(0, limit),
+      shoes
+    );
   }
-  return picked;
+
+  // Optionally hand the third slot to a cheaper last season shoe, but only when
+  // it is a genuinely close match. Promoting a clearly worse shoe just because
+  // it is old would be selling, not recommending.
+  if (opts.valuePick && picked.length >= 3) {
+    const slot3 = picked[2];
+    // Every family already on the page, not just the top two, or the promoted
+    // shoe could turn up again lower down as its own sibling.
+    const takenFamilies = new Set(picked.map(p => p.shoe.family).filter(Boolean));
+    const takenIds = new Set(picked.map(p => p.shoe.id));
+    const brandTally = {};
+    picked.forEach(p => { brandTally[p.shoe.brand] = (brandTally[p.shoe.brand] || 0) + 1; });
+    const candidate = scored.find(
+      s =>
+        s.shoe.status === 'outgoing' &&
+        !takenIds.has(s.shoe.id) &&
+        !(s.shoe.family && takenFamilies.has(s.shoe.family)) &&
+        s.shoe.rrp_gbp > 0 &&
+        slot3.shoe.rrp_gbp - s.shoe.rrp_gbp >= MIN_SAVING_GBP &&
+        slot3.score - s.score <= VALUE_PICK_MAX_GAP &&
+        (brandTally[s.shoe.brand] || 0) < 2
+    );
+    if (candidate) {
+      picked.splice(2, 0, { ...candidate, valuePick: true });
+      picked.length = Math.min(picked.length, limit);
+    }
+  }
+
+  return withSiblings(picked, shoes);
 }
 
 export function summarise(a, brandsLiked) {
@@ -417,4 +480,14 @@ export function summarise(a, brandsLiked) {
   if (a.plate === 'yes') bits.push('wanting a plate');
   else if (a.plate === 'no') bits.push('no plates');
   return bits.join(', ');
+}
+
+// Marks each result with the cheaper outgoing version of the same shoe, where
+// one exists and is not already on the list.
+function withSiblings(entries, shoes) {
+  const shown = new Set(entries.map(e => e.shoe.id));
+  return entries.map(e => {
+    const sib = cheaperSiblingOf(e.shoe, shoes);
+    return sib && !shown.has(sib.id) ? { ...e, cheaperSibling: sib } : e;
+  });
 }

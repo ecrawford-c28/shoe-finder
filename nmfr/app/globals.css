@@ -219,6 +219,13 @@ input.text:focus { outline: none; border-color: var(--accent); }
 .prose h2 { font-size: 20px; margin-top: 30px; }
 .prose p, .prose li { color: #c9c9c5; font-size: 16px; }
 
+.rank.value { background: #2b2b1a; color: var(--accent); border: 1px solid var(--accent); left: auto; right: 20px; }
+.cheaper {
+  font-size: 13px; line-height: 1.45; color: #c9c9c5;
+  border-left: 2px solid var(--accent); padding: 2px 0 2px 11px; margin: 0 0 14px;
+}
+.cheaper b { color: var(--ink); font-weight: 650; }
+.cheaper a { text-decoration: underline; text-underline-offset: 2px; }
 .outgoing {
   display: inline-block; font-size: 13px; line-height: 1.4; color: var(--ink);
   background: #23231c; border: 1px solid #4a4a33; border-radius: 8px;

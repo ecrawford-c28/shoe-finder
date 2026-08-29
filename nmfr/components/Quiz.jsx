@@ -166,6 +166,7 @@ function ShoeCard({ entry, rank, size, clearWinner }) {
   return (
     <article className={`card${rank === 0 ? ' top' : ''}${imgOk ? ' has-img' : ''}`}>
       {rank === 0 && <span className="rank">{clearWinner ? 'Best match' : 'Top pick'}</span>}
+      {entry.valuePick && <span className="rank value">Best value</span>}
       {imgOk ? (
         <img
           className="shoe-img"
@@ -191,6 +192,16 @@ function ShoeCard({ entry, rank, size, clearWinner }) {
           </>
         )}
       </div>
+      {entry.cheaperSibling ? (
+        <p className="cheaper">
+          Last year&apos;s <b>{entry.cheaperSibling.model}</b> is still available and usually
+          discounted.{' '}
+          <a href={`/go/${entry.cheaperSibling.id}`} target="_blank" rel="nofollow sponsored noopener">
+            Check the price
+          </a>
+          .
+        </p>
+      ) : null}
       {s.status === 'outgoing' ? (
         <p className="outgoing">
           Last year&apos;s model. Same shoe as the current version in all but the details, and
@@ -241,7 +252,7 @@ function ShoeCard({ entry, rank, size, clearWinner }) {
 }
 
 function Results({ answers, shoes, onRestart }) {
-  const results = useMemo(() => scoreShoes(shoes, answers), [shoes, answers]);
+  const results = useMemo(() => scoreShoes(shoes, answers, 5, { valuePick: true }), [shoes, answers]);
   const top = results.slice(0, 3);
   const more = results.slice(3, 5);
   const summary = summarise(answers);
