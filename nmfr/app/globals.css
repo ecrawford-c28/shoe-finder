@@ -259,3 +259,154 @@ input.text:focus { outline: none; border-color: var(--accent); }
 .guide-index li { border-top: 1px solid var(--line, #26262e); padding: 16px 0; }
 .guide-index li a { font-size: 18px; font-weight: 700; display: block; margin-bottom: 4px; }
 .guide-index li span { color: var(--muted); font-size: 15px; }
+
+/* Lifted out of inline styles so the desktop rules below can override them. */
+.results h3.also { margin-top: 34px; font-size: 20px; letter-spacing: -.02em; }
+.end-actions { margin-top: 30px; display: grid; grid-gap: 10px; gap: 10px; }
+
+/* ---------------------------------------------------------------------------
+   Desktop. Everything above this line is the phone layout and is untouched by
+   what follows: nothing here applies below 900px, and the extra desktop-only
+   blocks in the markup are hidden by default rather than shown by default.
+   --------------------------------------------------------------------------- */
+
+.mainnav { display: none; }
+.hero-demo, .results-side, .guide-side, .guide-list .g-img { display: none; }
+
+@media (min-width: 900px) {
+  .wrap {
+    max-width: 1120px; padding: 0 32px;
+    min-height: 100vh; display: flex; flex-direction: column;
+  }
+  .wrap > main { flex: 1 0 auto; }
+  .wrap > .footer { margin-top: 44px; }
+  .q { min-height: 0; }
+
+  /* Masthead gains real navigation, since the footer was the only way around. */
+  .masthead { padding: 26px 0 18px; gap: 28px; }
+  .mainnav { display: flex; gap: 24px; margin-right: auto; margin-left: 40px; }
+  .mainnav a { font-size: 15px; color: var(--muted); text-decoration: none; }
+  .mainnav a:hover { color: var(--ink); }
+
+  /* Anything that is pure reading matter keeps a sane measure. */
+  .prose { max-width: 720px; }
+  .guide-index-page { max-width: none; }
+  .guide-index-page .index-lede { max-width: 640px; }
+
+  /* --- Home ------------------------------------------------------------- */
+  .hero {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) 380px;
+    gap: 60px;
+    align-items: center;
+    min-height: calc(100vh - 230px);
+    padding: 10px 0 40px;
+  }
+  .hero h1 { font-size: clamp(38px, 3.4vw, 50px); }
+  .hero p { font-size: 18px; }
+  .hero .btn { width: auto; padding: 18px 40px; font-size: 18px; }
+  .hero-demo { display: block; }
+  .demo-label {
+    font-size: 11px; text-transform: uppercase; letter-spacing: .1em;
+    color: var(--muted); margin: 0 0 10px; text-align: center;
+  }
+  .demo-card {
+    background: var(--card); border: 1px solid var(--line); border-radius: 20px;
+    padding: 20px; position: relative;
+  }
+  .demo-card .rank { position: absolute; top: -11px; left: 20px; }
+  .demo-card .brand { color: var(--muted); font-size: 13px; letter-spacing: .1em; text-transform: uppercase; }
+  .demo-card h3 { font-size: 23px; letter-spacing: -.025em; margin: 3px 0 6px; font-weight: 750; }
+  .demo-card .price { font-weight: 700; font-size: 16px; margin-bottom: 12px; }
+  .demo-card .price span { color: var(--muted); font-weight: 400; font-size: 13px; }
+  .demo-card ul { list-style: none; padding: 0; margin: 0; display: grid; gap: 7px; }
+  .demo-card li { font-size: 14px; color: #d7d7d3; padding-left: 20px; position: relative; }
+  .demo-card li:before { content: '✓'; position: absolute; left: 0; color: var(--accent); font-weight: 700; }
+  .demo-fade { margin: 14px 0 0; font-size: 13px; color: #6f6f7c; }
+
+  /* --- Questions -------------------------------------------------------- */
+  .q { max-width: 760px; margin: 0 auto; padding-top: 10px; }
+  .q h2 { font-size: 36px; }
+  /* Two columns once there are enough options to justify it. Browsers without
+     :has simply keep the single column, which is the phone layout and is fine. */
+  .opts:has(> :nth-child(4)) { grid-template-columns: 1fr 1fr; }
+  .actions .btn { width: auto; min-width: 240px; }
+  input.text { max-width: 420px; }
+
+  /* --- Results ---------------------------------------------------------- */
+  .results {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) 320px;
+    gap: 40px;
+    align-items: start;
+  }
+  .results-side { display: block; position: sticky; top: 28px; }
+  /* The sidebar carries these, so the inline copies come out. */
+  .results-main > .disclosure, .results-main > .end-actions { display: none; }
+  .side-box {
+    background: var(--bg-2); border: 1px solid var(--line);
+    border-radius: 16px; padding: 18px; margin-bottom: 14px;
+  }
+  .side-box h4 {
+    margin: 0 0 10px; font-size: 11px; letter-spacing: .14em;
+    text-transform: uppercase; color: var(--muted); font-weight: 700;
+  }
+  .side-box p { margin: 0; font-size: 15px; color: #d7d7d3; }
+  .side-box .btn { margin-top: 10px; font-size: 15px; padding: 13px 18px; }
+  .results-side .disclosure { margin: 0; }
+
+  /* Top pick gets the width, with the shoe beside the reasoning. */
+  .card.top { padding: 26px; }
+  .card.top.has-img {
+    display: grid; grid-template-columns: 300px minmax(0, 1fr);
+    gap: 28px; align-items: start;
+  }
+  .card.top .shoe-img { height: 240px; margin: 0; }
+  .card.top h3 { font-size: 30px; }
+
+  /* The rest sit two across. */
+  .card-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; align-items: stretch; }
+  .card-grid .card { margin: 0; display: flex; flex-direction: column; }
+  .card-grid .card-body { display: flex; flex-direction: column; flex: 1; }
+  /* Pushes the specs, the buy button and anything after them to the bottom so
+     the buttons line up across the row however long the copy is. */
+  .card-grid .card-body .specs { margin-top: auto; }
+  .results h3.also { margin-top: 38px; }
+
+  /* --- Guides ----------------------------------------------------------- */
+  /* The index is a list of ten, which reads better two across than as one
+     long column with half the screen empty beside it. */
+  .guide-index { display: grid; grid-template-columns: 1fr 1fr; gap: 0 40px; }
+  .guide-index li { padding: 18px 0; }
+
+  .guide {
+    max-width: none;
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) 300px;
+    gap: 52px;
+    align-items: start;
+  }
+  .guide-main { max-width: 680px; min-width: 0; }
+  .guide-side { display: block; position: sticky; top: 28px; padding-top: 26px; }
+  .guide-side nav { display: grid; gap: 9px; }
+  .guide-side nav a { font-size: 15px; color: var(--muted); text-decoration: none; }
+  .guide-side nav a:hover { color: var(--ink); }
+  .guide-side .btn { font-size: 15px; padding: 14px 18px; }
+
+  /* Shortlist entries get the shoe alongside them. */
+  .guide-list > li:has(.g-img) { display: grid; grid-template-columns: 130px minmax(0, 1fr); gap: 22px; }
+  .guide-list .g-img {
+    display: block; width: 130px; height: 100px; object-fit: contain;
+    background: #fff; border-radius: 10px; margin-top: 6px;
+  }
+  .guide-list > li:has(.g-img) > :not(.g-img) { grid-column: 2; }
+  .guide-list > li h3:before { content: counter(pick) '. '; }
+}
+
+@media (min-width: 1240px) {
+  .hero { grid-template-columns: minmax(0, 1fr) 420px; gap: 80px; }
+}
+
+@media (min-width: 1400px) {
+  .wrap { max-width: 1200px; }
+}

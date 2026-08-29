@@ -67,9 +67,12 @@ export default async function Guide({ params }) {
     ],
   };
 
+  const others = GUIDES.filter(x => x.slug !== g.slug).slice(0, 5);
+
   return (
-    <main className="prose">
+    <main className="prose guide">
       <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }} />
+      <div className="guide-main">
       <p className="meta" style={{ marginBottom: 8 }}>
         <a href="/guides">Guides</a>
       </p>
@@ -83,7 +86,7 @@ export default async function Guide({ params }) {
         you pay and it plays no part in which shoes are listed.
       </div>
 
-      <h2>The shortlist</h2>
+      <h2 id="shortlist">The shortlist</h2>
       <p>
         These are the shoes the <a href="/">Shoe Finder quiz</a> returns when you answer it as
         someone in this situation. Same database, same scoring, nothing added by hand. Answer it
@@ -94,6 +97,9 @@ export default async function Guide({ params }) {
       <ol className="guide-list">
         {picks.map(({ shoe, reasons }) => (
           <li key={shoe.id}>
+            {shoe.image_url ? (
+              <img className="g-img" src={shoe.image_url} alt={`${shoe.brand} ${shoe.model}`} loading="lazy" />
+            ) : null}
             <h3>
               {shoe.brand} {shoe.model}
             </h3>
@@ -128,7 +134,7 @@ export default async function Guide({ params }) {
         ))}
       </ol>
 
-      <h2>How this list was put together</h2>
+      <h2 id="method">How this list was put together</h2>
       <p>
         Every shoe in our database is scored against a set of rules, and this page shows the top
         eight for this particular need. The rules are written down in full on the{' '}
@@ -141,7 +147,7 @@ export default async function Guide({ params }) {
         running through pain see a physio rather than buying your way out of it.
       </p>
 
-      <h2>Common questions</h2>
+      <h2 id="faq">Common questions</h2>
       {g.faq.map(([q, a], i) => (
         <div key={i}>
           <h3>{q}</h3>
@@ -149,7 +155,7 @@ export default async function Guide({ params }) {
         </div>
       ))}
 
-      <h2>Get a list for your feet, not an average one</h2>
+      <h2 id="quiz">Get a list for your feet, not an average one</h2>
       <p>
         The shortlist above assumes a fairly typical runner. The{' '}
         <a href="/">shoe finder</a> asks about your width, how your ankles roll, your weight, where
@@ -161,6 +167,35 @@ export default async function Guide({ params }) {
           Start the quiz
         </a>
       </p>
+      </div>
+
+      <aside className="guide-side">
+        <div className="side-box">
+          <h4>On this page</h4>
+          <nav>
+            <a href="#shortlist">The shortlist</a>
+            <a href="#method">How the list was built</a>
+            <a href="#faq">Common questions</a>
+          </nav>
+        </div>
+        <div className="side-box">
+          <h4>Get your own list</h4>
+          <p>Twelve questions, three shoes, and the reason for each one.</p>
+          <a className="btn" href="/">
+            Start the quiz
+          </a>
+        </div>
+        <div className="side-box">
+          <h4>Other guides</h4>
+          <nav>
+            {others.map(o => (
+              <a key={o.slug} href={`/guides/${o.slug}`}>
+                {o.h1}
+              </a>
+            ))}
+          </nav>
+        </div>
+      </aside>
     </main>
   );
 }

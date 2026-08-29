@@ -9,9 +9,9 @@ export const metadata = {
 
 export default function Guides() {
   return (
-    <main className="prose">
+    <main className="prose guide-index-page">
       <h1>Running shoe guides</h1>
-      <p>
+      <p className="index-lede">
         Each guide explains what actually matters for one particular need, then shows the shoes our{' '}
         <a href="/">shoe finder</a> picks for it. Same database, same scoring, no hand picked
         favourites.

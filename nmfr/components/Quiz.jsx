@@ -13,9 +13,10 @@ const CAT_LABEL = {
   trail: 'Trail',
 };
 
-function Intro({ onStart, count, questions }) {
+function Intro({ onStart, count, questions, sample }) {
   return (
     <section className="hero">
+      <div className="hero-copy">
       <h1>
         Which running shoes
         <br />
@@ -38,6 +39,29 @@ function Intro({ onStart, count, questions }) {
         Or read the <a href="/guides">shoe guides</a>, covering wide feet, overpronation, knee and
         achilles pain, cushioning, trail and price.
       </p>
+      </div>
+      {sample ? (
+        <aside className="hero-demo">
+          <p className="demo-label">An example result</p>
+          <div className="demo-card">
+            <span className="rank">Best match</span>
+            <div className="brand">{sample.brand}</div>
+            <h3>{sample.model}</h3>
+            <div className="price">
+              £{sample.rrp} <span>RRP</span>
+            </div>
+            <ul>
+              {sample.reasons.map((r, i) => (
+                <li key={i}>{r}</li>
+              ))}
+            </ul>
+          </div>
+          <p className="demo-fade">
+            That is a real result for someone after comfortable road miles who gets achilles
+            trouble. Yours will be shaped by your own answers.
+          </p>
+        </aside>
+      ) : null}
     </section>
   );
 }
@@ -140,7 +164,7 @@ function ShoeCard({ entry, rank, size, clearWinner }) {
     s.widths.includes('extra_wide') ? '4E available' : s.widths.includes('wide') ? 'Wide fitting' : null;
   const deal = discountInfo(s);
   return (
-    <article className={`card${rank === 0 ? ' top' : ''}`}>
+    <article className={`card${rank === 0 ? ' top' : ''}${imgOk ? ' has-img' : ''}`}>
       {rank === 0 && <span className="rank">{clearWinner ? 'Best match' : 'Top pick'}</span>}
       {imgOk ? (
         <img
@@ -151,6 +175,7 @@ function ShoeCard({ entry, rank, size, clearWinner }) {
           onError={() => setImgOk(false)}
         />
       ) : null}
+      <div className="card-body">
       <div className="brand">{s.brand}</div>
       <h3>{s.model}</h3>
       <div className="price">
@@ -204,6 +229,7 @@ function ShoeCard({ entry, rank, size, clearWinner }) {
           {widthNote ? ` in a ${s.widths.includes('extra_wide') ? '4E' : 'wide'} fitting` : ''}.
         </p>
       ) : null}
+      </div>
     </article>
   );
 }
@@ -218,86 +244,112 @@ function Results({ answers, shoes, onRestart }) {
   // Measured across every persona, the gap between shoes is usually a point or
   // two, which is well inside the noise of our own scoring.
   const clearWinner = top.length < 2 || top[0].score - top[1].score >= 5;
+  const disclosure = anyDeal
+    ? 'We earn a small commission if you buy through these links, and the discount code is part of that arrangement. The code lowers what you pay, and neither the code nor the commission plays any part in which shoes get recommended.'
+    : 'We earn a small commission if you buy through these links. It costs you nothing extra and it plays no part in which shoes get recommended.';
 
   return (
     <section className="results">
-      <h2>Here are your three.</h2>
-      <p className="lede">
-        Based on <b>{summary}</b>.
-      </p>
+      <div className="results-main">
+        <h2>Here are your three.</h2>
+        <p className="lede">
+          Based on <b>{summary}</b>.
+        </p>
 
-      <div className="disclosure">
-        <b>Ad.</b>{' '}
-        {anyDeal ? (
-          <>
-            We earn a small commission if you buy through these links, and the discount code is part
-            of that arrangement. The code lowers what you pay, and neither the code nor the
-            commission plays any part in which shoes get recommended.
-          </>
-        ) : (
-          <>
-            We earn a small commission if you buy through these links. It costs you nothing extra and
-            it plays no part in which shoes get recommended.
-          </>
-        )}
-      </div>
+        <div className="disclosure">
+          <b>Ad.</b> {disclosure}
+        </div>
 
-      {top.map((entry, i) => (
         <ShoeCard
-          key={entry.shoe.id}
-          entry={entry}
-          rank={i}
+          entry={top[0]}
+          rank={0}
           size={answers.size}
           clearWinner={clearWinner}
         />
-      ))}
-      {!clearWinner && top.length > 1 ? (
-        <p className="meta" style={{ color: '#6f6f7c', fontSize: 13, marginTop: -6 }}>
-          These three scored within a whisker of each other, so treat them as a shortlist rather than
-          a ranking. Pick on fit, price, or which one you like the look of.
+        {top.length > 1 && (
+          <div className="card-grid">
+            {top.slice(1).map((entry, i) => (
+              <ShoeCard
+                key={entry.shoe.id}
+                entry={entry}
+                rank={i + 1}
+                size={answers.size}
+                clearWinner={clearWinner}
+              />
+            ))}
+          </div>
+        )}
+        {!clearWinner && top.length > 1 ? (
+          <p className="meta" style={{ color: '#6f6f7c', fontSize: 13, marginTop: -6 }}>
+            These three scored within a whisker of each other, so treat them as a shortlist rather
+            than a ranking. Pick on fit, price, or which one you like the look of.
+          </p>
+        ) : null}
+
+        {more.length > 0 && (
+          <>
+            <h3 className="also">Also worth a look</h3>
+            <div className="card-grid">
+              {more.map(entry => (
+                <ShoeCard key={entry.shoe.id} entry={entry} rank={9} size={answers.size} />
+              ))}
+            </div>
+          </>
+        )}
+
+        <div className="end-actions">
+          <button className="btn ghost" onClick={onRestart}>
+            Start again
+          </button>
+          <a
+            className="btn ghost"
+            href="https://www.instagram.com/notmadeforrunning/"
+            target="_blank"
+            rel="noopener noreferrer"
+          >
+            Follow Not Made For Running
+          </a>
+        </div>
+
+        <p className="meta" style={{ color: '#6f6f7c', fontSize: 13, marginTop: 26 }}>
+          This is a starting point, not medical advice. If you are running through pain or coming
+          back from an injury, go and see a physio, and try shoes on before you commit where you
+          can.
+          {answers.niggles && answers.niggles !== 'none' ? (
+            <>
+              {' '}
+              You told us you get regular pain, so that last bit matters. A different shoe can take
+              some load off a sore spot, but it will not fix the reason it is sore, and changing
+              heel drop suddenly can cause its own problems. Move across gradually.
+            </>
+          ) : null}
         </p>
-      ) : null}
-
-      {more.length > 0 && (
-        <>
-          <h3 style={{ marginTop: 34, fontSize: 20, letterSpacing: '-0.02em' }}>Also worth a look</h3>
-          {more.map(entry => (
-            <ShoeCard key={entry.shoe.id} entry={entry} rank={9} size={answers.size} />
-          ))}
-        </>
-      )}
-
-      <div style={{ marginTop: 30, display: 'grid', gap: 10 }}>
-        <button className="btn ghost" onClick={onRestart}>
-          Start again
-        </button>
-        <a
-          className="btn ghost"
-          href="https://www.instagram.com/notmadeforrunning/"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          Follow Not Made For Running
-        </a>
       </div>
 
-      <p className="meta" style={{ color: '#6f6f7c', fontSize: 13, marginTop: 26 }}>
-        This is a starting point, not medical advice. If you are running through pain or coming back
-        from an injury, go and see a physio, and try shoes on before you commit where you can.
-        {answers.niggles && answers.niggles !== 'none' ? (
-          <>
-            {' '}
-            You told us you get regular pain, so that last bit matters. A different shoe can take
-            some load off a sore spot, but it will not fix the reason it is sore, and changing heel
-            drop suddenly can cause its own problems. Move across gradually.
-          </>
-        ) : null}
-      </p>
+      <aside className="results-side">
+        <div className="side-box">
+          <h4>Your answers</h4>
+          <p>{summary}</p>
+          <button className="btn ghost" onClick={onRestart}>
+            Start again
+          </button>
+        </div>
+        <div className="side-box">
+          <h4>More from us</h4>
+          <p>Guides for wide feet, overpronation, sore knees and achilles, and shoes under £140.</p>
+          <a className="btn ghost" href="/guides">
+            Read the guides
+          </a>
+        </div>
+        <div className="disclosure">
+          <b>Ad.</b> {disclosure}
+        </div>
+      </aside>
     </section>
   );
 }
 
-export default function Quiz({ shoes, brands }) {
+export default function Quiz({ shoes, brands, sample }) {
   const [stage, setStage] = useState('intro');
   const [step, setStep] = useState(0);
   const [answers, setAnswers] = useState({});
@@ -357,7 +409,7 @@ export default function Quiz({ shoes, brands }) {
   return (
     <main ref={topRef}>
       {stage === 'intro' && (
-        <Intro count={shoes.length} questions={total} onStart={start} />
+        <Intro count={shoes.length} questions={total} onStart={start} sample={sample} />
       )}
       {stage === 'quiz' && (
         <Question

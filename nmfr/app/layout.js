@@ -64,6 +64,11 @@ export default function RootLayout({ children }) {
               </div>
               <div className="byline">by Not Made For Running</div>
             </a>
+            <nav className="mainnav">
+              <a href="/">Take the quiz</a>
+              <a href="/guides">Guides</a>
+              <a href="/how-it-works">How it works</a>
+            </nav>
             <a
               className="ig"
               href="https://www.instagram.com/notmadeforrunning/"
