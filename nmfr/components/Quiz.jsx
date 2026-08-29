@@ -160,7 +160,10 @@ function ShoeCard({ entry, rank, size, clearWinner }) {
             <s>£{Number(s.rrp_gbp).toFixed(2).replace('.00', '')}</s>
           </>
         ) : (
-          <>£{Number(s.rrp_gbp).toFixed(2).replace('.00', '')}</>
+          <>
+            £{Number(s.rrp_gbp).toFixed(2).replace('.00', '')}{' '}
+            <span className="rrp-note">RRP, often less at the shop</span>
+          </>
         )}
       </div>
       {deal ? (
