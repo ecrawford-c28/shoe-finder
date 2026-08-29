@@ -82,6 +82,7 @@ export default function RootLayout({ children }) {
           <footer className="footer">
             <a href="/">Shoe finder</a>
             <a href="/guides">Guides</a>
+            <a href="/compare">Comparisons</a>
             <a href="/how-it-works">How it works</a>
             <a href="/privacy">Privacy</a>
             <a href="/terms">Terms</a>

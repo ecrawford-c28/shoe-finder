@@ -267,6 +267,14 @@ input.text:focus { outline: none; border-color: var(--accent); }
 .guide-specs { font-size: 14px; color: var(--muted); margin: 0 0 10px; }
 .guide-links { font-size: 15px; }
 .guide-links a { font-weight: 600; }
+.vs-wrap { overflow-x: auto; margin: 0 0 22px; }
+.vs { border-collapse: collapse; width: 100%; min-width: 420px; font-size: 15px; }
+.vs th, .vs td { text-align: left; padding: 11px 14px; border-bottom: 1px solid var(--line); }
+.vs thead th { font-size: 15px; color: var(--ink); font-weight: 700; border-bottom: 1px solid var(--accent); }
+.vs tbody th { color: var(--muted); font-weight: 400; width: 34%; }
+.vs tbody td { color: #d7d7d3; }
+.vs-pick { border-top: 1px solid var(--line); padding-top: 16px; margin-top: 18px; }
+.vs-pick h3 { margin: 0 0 6px; }
 .guide-index { list-style: none; padding: 0; }
 .guide-index li { border-top: 1px solid var(--line, #26262e); padding: 16px 0; }
 .guide-index li a { font-size: 18px; font-weight: 700; display: block; margin-bottom: 4px; }
