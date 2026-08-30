@@ -214,6 +214,18 @@ function ShoeCard({ entry, rank, size, clearWinner }) {
           for you at checkout
         </p>
       ) : null}
+      {entry.sfs != null ? (
+        <p className="sfs">
+          <b>{entry.sfs}</b>
+          <span className="sfs-of">/10</span>
+          <a href="/how-it-works#shoe-finder-score" className="sfs-label">
+            Shoe Finder Score
+          </a>
+          {s.rating_count ? (
+            <span className="sfs-n">from {s.rating_count.toLocaleString('en-GB')} reviews</span>
+          ) : null}
+        </p>
+      ) : null}
       {s.one_liner && <p className="liner">{s.one_liner}</p>}
       <ul className="why">
         {entry.reasons.map((r, i) => (
