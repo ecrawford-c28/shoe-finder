@@ -430,3 +430,34 @@ input.text:focus { outline: none; border-color: var(--accent); }
 @media (min-width: 1400px) {
   .wrap { max-width: 1200px; }
 }
+
+/* Shoe Finder Score. Hidden entirely when there is no rating data behind it,
+   so an empty column shows nothing rather than a zero. */
+.sfs {
+  display: flex;
+  align-items: baseline;
+  gap: 6px;
+  margin: 0 0 12px;
+  flex-wrap: wrap;
+}
+.sfs b {
+  font-size: 22px;
+  line-height: 1;
+  color: var(--accent);
+  font-variant-numeric: tabular-nums;
+}
+.sfs .sfs-of {
+  font-size: 13px;
+  color: var(--muted);
+  margin-left: -3px;
+}
+.sfs .sfs-label {
+  font-size: 13px;
+  font-weight: 600;
+  color: #d7d7d3;
+  text-decoration: underline;
+  text-decoration-style: dotted;
+  text-underline-offset: 3px;
+}
+.sfs .sfs-label:hover { color: var(--ink); }
+.sfs .sfs-n { font-size: 12px; color: var(--muted); }
