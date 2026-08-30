@@ -68,6 +68,11 @@ function rowsToShoes(rows) {
       discount_percent: num(o.discount_percent),
       image_url: (o.image_url || '').trim(),
       review_url: (o.review_url || '').trim(),
+      // Customer rating out of 5 and how many people left one. Both come from the
+      // retailer feed and are simply absent until that feed lands, which is why
+      // nothing downstream may assume they are present.
+      rating: num(o.rating),
+      rating_count: Math.round(num(o.rating_count)),
       one_liner: (o.one_liner || '').trim(),
       status: (o.status || 'current').trim().toLowerCase(),
       // Groups a shoe with its own earlier or later versions, so the quiz never

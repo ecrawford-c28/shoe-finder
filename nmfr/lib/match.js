@@ -193,6 +193,72 @@ const VALUE_PICK_MAX_GAP = 8;
 // penny cheaper qualified as the best value option, which is daft.
 const MIN_SAVING_GBP = 10;
 
+
+// --- Shoe Finder Score -------------------------------------------------------
+// Two different things that are easy to confuse. The customer rating is what
+// buyers of that shoe said, on a five point scale. The Shoe Finder Score is what
+// we publish, out of ten, and it is that rating put on a common footing so the
+// numbers mean something when you compare them.
+//
+// Three deliberate decisions, all of which protect the cheaper and less famous
+// shoes in the list:
+//
+// 1. Raw star ratings are useless as they stand. Almost every running shoe sits
+//    between 4.2 and 4.9, so scaling that straight to ten gives everything an
+//    8.4 or better and tells the reader nothing.
+// 2. A shoe with four reviews at five stars has not earned a ten. Every rating
+//    is pulled towards the average by an amount that depends on how many people
+//    left one, so confidence has to be bought with volume.
+// 3. A shoe with no ratings at all sits at the average rather than at zero. That
+//    matters here: budget, stability and trail shoes get reviewed far less often
+//    than the halo models, and scoring them as bad because nobody wrote about
+//    them would quietly hollow out those parts of the results.
+//
+// None of this exists until the retailer feed carries rating data. Every
+// function below returns null on missing data, and the ranking then behaves
+// exactly as it did before any of this was added.
+
+// Reviews needed before a shoe's own rating outweighs the average.
+export const MIN_RATINGS_FOR_SCORE = 15;
+// Most the score can move a shoe up or down the list. Smaller than a single
+// category match on purpose: a well reviewed shoe should win a close call, never
+// drag itself into a list it does not belong in.
+const RATING_WEIGHT = 15;
+// Fewer rated shoes than this and there is nothing meaningful to normalise
+// against, so no score is published at all.
+const MIN_RATED_SHOES = 8;
+// A shoe with a handful of reviews gets pulled so hard towards the average that
+// its score carries almost no information. Publishing one anyway just puts a
+// confident looking number next to thin evidence, so below this it shows nothing.
+const MIN_COUNT_TO_PUBLISH = 10;
+
+export function ratingStats(shoes) {
+  const rated = shoes.filter(s => s.rating > 0 && s.rating_count > 0);
+  if (rated.length < MIN_RATED_SHOES) return null;
+  const totalCount = rated.reduce((n, s) => n + s.rating_count, 0);
+  // Weighted by review count, so a single shoe with a handful of glowing
+  // reviews cannot drag the average it is being measured against.
+  const mean = rated.reduce((n, s) => n + s.rating * s.rating_count, 0) / totalCount;
+  const variance = rated.reduce((n, s) => n + (s.rating - mean) ** 2, 0) / rated.length;
+  // A floor on the spread, otherwise a set of near identical ratings divides by
+  // almost nothing and throws every shoe to 1 or 10.
+  const sd = Math.max(Math.sqrt(variance), 0.08);
+  return { mean, sd, n: rated.length };
+}
+
+export function shoeFinderScore(shoe, stats) {
+  if (!stats || !(shoe.rating > 0) || !(shoe.rating_count >= MIN_COUNT_TO_PUBLISH)) return null;
+  const v = shoe.rating_count;
+  const m = MIN_RATINGS_FOR_SCORE;
+  // Pull towards the average in proportion to how thin the evidence is.
+  const adjusted = (v / (v + m)) * shoe.rating + (m / (v + m)) * stats.mean;
+  const z = (adjusted - stats.mean) / stats.sd;
+  // Centre on 7.5 and stretch, so the useful part of the range is actually used
+  // rather than everything bunching in the eights.
+  const out = 7.5 + z * 1.4;
+  return Math.max(1, Math.min(10, Math.round(out * 10) / 10));
+}
+
 export function scoreShoes(shoes, a, limit = 5, opts = {}) {
   const budget = parseFloat(a.budget || '9999');
   const avoid = new Set(a.avoid || []);
@@ -201,6 +267,9 @@ export function scoreShoes(shoes, a, limit = 5, opts = {}) {
   // A straight no on plates is a real filter, not a nudge. There are plenty of
   // quick unplated shoes left, so this never leaves the list thin.
   const pool = a.plate === 'no' ? shoes.filter(s => s.plate === 'none') : shoes;
+  // Worked out once against the whole pool, not per shoe, so every shoe is
+  // measured on the same scale. Null until the feed carries ratings.
+  const ratingCtx = ratingStats(pool);
 
   const scored = pool.map(shoe => {
     let score = 0;
@@ -364,6 +433,17 @@ export function scoreShoes(shoes, a, limit = 5, opts = {}) {
       }
     }
 
+    // --- Shoe Finder Score -------------------------------------------------
+    // Deliberately capped. This is the last word in a close call between two
+    // shoes that both fit, not a reason to recommend one that does not.
+    const sfs = shoeFinderScore(shoe, ratingCtx);
+    if (sfs !== null) {
+      score += ((sfs - 7.5) / 2.5) * RATING_WEIGHT;
+      if (sfs >= 8.5 && shoe.rating_count >= 50) {
+        why(5, `Shoe Finder Score ${sfs} out of 10, from ${shoe.rating_count} customer reviews`);
+      }
+    }
+
     // --- General quality and tie breaking ----------------------------------
     if (shoe.durability === 'high') score += 4;
     else if (shoe.durability === 'low' && a.purpose !== 'race_day') score -= 3;
@@ -381,7 +461,7 @@ export function scoreShoes(shoes, a, limit = 5, opts = {}) {
       .sort((x, y) => y.priority - x.priority)
       .slice(0, 4)
       .map(r => r.text);
-    return { shoe, score: Math.round(score * 10) / 10, reasons, flags };
+    return { shoe, score: Math.round(score * 10) / 10, reasons, flags, sfs };
   });
 
   scored.sort((x, y) => y.score - x.score);
