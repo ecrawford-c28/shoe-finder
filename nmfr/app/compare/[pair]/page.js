@@ -1,6 +1,7 @@
 import { notFound } from 'next/navigation';
 import { getShoes } from '../../../lib/shoes';
 import { PAIRS, ALL_PAIR_SLUGS, pairSlug, pairFromSlug, comparison, verdict } from '../../../lib/compare';
+import { ratingStats, shoeFinderScore } from '../../../lib/match.js';
 
 export const revalidate = 300;
 
@@ -72,6 +73,16 @@ export default async function Compare({ params }) {
   ];
   if (a.stack_heel_mm && b.stack_heel_mm) {
     rows.splice(5, 0, ['Heel stack', `${a.stack_heel_mm}mm`, `${b.stack_heel_mm}mm`]);
+  }
+  // Only worth a row if there is a score for at least one of the two. A column
+  // of dashes tells the reader nothing and makes the table look broken.
+  const stats = ratingStats(shoes);
+  const sa = shoeFinderScore(a, stats);
+  const sb = shoeFinderScore(b, stats);
+  const scoreCell = (v, s) =>
+    v == null ? 'Not enough reviews yet' : `${v}/10 from ${s.rating_count.toLocaleString('en-GB')} reviews`;
+  if (sa != null || sb != null) {
+    rows.unshift(['Shoe Finder Score', scoreCell(sa, a), scoreCell(sb, b)]);
   }
 
   return (
