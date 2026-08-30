@@ -1,3 +1,8 @@
+import { getShoes } from '../../lib/shoes';
+import { ratingStats } from '../../lib/match.js';
+
+export const revalidate = 300;
+
 export const metadata = {
   title: 'How the shoe finder works',
   description:
@@ -5,7 +10,11 @@ export const metadata = {
   alternates: { canonical: '/how-it-works' },
 };
 
-export default function How() {
+export default async function How() {
+  // The score section only appears once there is rating data behind it, so the
+  // page never explains a number the reader cannot find anywhere on the site.
+  const { shoes } = await getShoes();
+  const hasScores = Boolean(ratingStats(shoes));
   return (
     <main className="prose">
       <h1>How the shoe finder works</h1>
@@ -69,6 +78,43 @@ export default function How() {
           not working are removed completely.
         </li>
       </ul>
+
+      {hasScores ? (
+        <>
+      <h2 id="shoe-finder-score">The Shoe Finder Score</h2>
+      <p>
+        Some shoes carry a Shoe Finder Score out of ten. It is built from the star ratings left by
+        people who bought the shoe, put on a common footing so that comparing two numbers actually
+        tells you something.
+      </p>
+      <p>Three things are done to the raw ratings, and all three are deliberate.</p>
+      <ul>
+        <li>
+          <strong>The scale is stretched.</strong> Almost every running shoe sits between 4.2 and 4.9
+          stars, so an unadjusted score gives everything an eight or better and separates nothing.
+          The score spreads that narrow band out across the full ten points.
+        </li>
+        <li>
+          <strong>Thin evidence counts for less.</strong> Four five star reviews is not a ten. Every
+          rating is pulled back towards the average by an amount that depends on how many people left
+          one, so a shoe has to earn a high score with volume as well as enthusiasm.
+        </li>
+        <li>
+          <strong>No reviews is not the same as bad reviews.</strong> Cheaper shoes, support shoes
+          and trail shoes get reviewed far less often than the headline models. A shoe nobody has
+          rated is treated as average rather than scored as poor, so those parts of the range are
+          not quietly emptied out.
+        </li>
+      </ul>
+      <p>
+        The score is one input among many and a capped one. It settles a close call between two shoes
+        that both suit you. It cannot pull a shoe into your results that does not fit your answers in
+        the first place, and no amount of five star reviews will put a race shoe in front of a new
+        runner. Where a shoe has no ratings behind it, no score is shown at all rather than a
+        placeholder.
+      </p>
+        </>
+      ) : null}
 
       <h2>Where the buy links go</h2>
       <p>
