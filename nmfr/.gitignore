@@ -1,0 +1,23 @@
+# Installed, not authored. Restored by `npm ci` from package-lock.json.
+node_modules/
+
+# Build output. Vercel regenerates this on every deploy.
+.next/
+out/
+build/
+dist/
+
+# Secrets. The sheet URL and any Partnerize overrides live in Vercel's
+# environment variables, never in the repo.
+.env
+.env.local
+.env*.local
+
+# Tooling and editor noise
+.vercel/
+.turbo/
+*.tsbuildinfo
+npm-debug.log*
+yarn-error.log*
+.DS_Store
+Thumbs.db
