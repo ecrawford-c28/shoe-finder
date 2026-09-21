@@ -1,4 +1,4 @@
-import { getShoes, buyUrl } from '../../lib/shoes';
+import { getShoes, buyUrl, effectiveCamref } from '../../lib/shoes';
 
 export const revalidate = 300;
 
@@ -36,7 +36,10 @@ export async function GET() {
     withAwinId: shoes.filter(s => s.awin_mid).length,
     withWebgainsId: shoes.filter(s => s.wg_programid).length,
     withDiscountCode: shoes.filter(s => s.discount_code).length,
-    withPartnerizeCamref: shoes.filter(s => s.partnerize_camref).length,
+    // Effective, not what the sheet column says: most rows inherit the
+    // programme default rather than carrying their own.
+    withPartnerizeCamref: shoes.filter(s => effectiveCamref(s)).length,
+    camrefFromSheet: shoes.filter(s => s.partnerize_camref).length,
     webgainsCampaignSet: Boolean(process.env.WEBGAINS_CAMPAIGN_ID),
   });
 }
