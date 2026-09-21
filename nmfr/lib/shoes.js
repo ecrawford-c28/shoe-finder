@@ -114,7 +114,9 @@ export async function getShoes() {
 //
 //   awin_mid          Awin advertiser ID for the retailer in retailer_url
 //   wg_programid      Webgains programme ID for the retailer in retailer_url
-//   partnerize_camref Partnerize campaign reference for the retailer, e.g. 1101lAbCd
+//   partnerize_camref Partnerize campaign reference, per row. Optional: SportsShoes
+//                     rows fall back to DEFAULT_CAMREF below. Set this only to
+//                     override, such as for a second Partnerize retailer.
 //   discount_code     a Shopify discount code, applied automatically on click
 //   discount_percent  what that code takes off, used for the on screen message
 //   affiliate_url     a ready made tracking link that overrides all of them
@@ -160,6 +162,15 @@ export function webgainsLink(destinationUrl, programId, ref) {
 // variable because advertisers often get their own prf.hn subdomain.
 const PARTNERIZE_HOST = process.env.PARTNERIZE_HOST || 'prf.hn';
 
+// Every shoe on the site goes to the same retailer on the same Partnerize
+// campaign, so the camref is a property of the programme, not of a shoe.
+// Keeping it here rather than repeating it down 104 rows of the sheet means a
+// shoe added next week is tracked the moment it appears, instead of silently
+// earning nothing because one cell was left empty. A row may still carry its
+// own camref and that wins, which is what a second retailer would need.
+// This is not a secret: it is visible in every outbound link on the site.
+const DEFAULT_CAMREF = process.env.PARTNERIZE_CAMREF || '1011l5Rxk7';
+
 // Partnerize allows more punctuation than Awin, but a colon would collide with
 // its own separator. Their reporting caps this well above what we send.
 const pubref = id => String(id).replace(/[^A-Za-z0-9._-]/g, '-').slice(0, 100);
@@ -171,6 +182,13 @@ export function partnerizeLink(destinationUrl, camref, ref) {
   if (r) parts.push(`pubref:${r}`);
   parts.push(`destination:${encodeURIComponent(destinationUrl)}`);
   return `https://${PARTNERIZE_HOST}/click/${parts.join('/')}`;
+}
+
+// The camref a given shoe will actually be tracked under: its own if the sheet
+// sets one, otherwise the programme default for SportsShoes rows.
+export function effectiveCamref(shoe) {
+  if (shoe.partnerize_camref) return shoe.partnerize_camref;
+  return shoe.retailer === 'SportsShoes' ? DEFAULT_CAMREF : '';
 }
 
 export function shopifyDiscountLink(destinationUrl, code) {
@@ -195,7 +213,7 @@ export function buyUrl(shoe) {
   if (wg) return wg;
 
   // 4. Partnerize, if the sheet gives a campaign reference for this row.
-  const pz = partnerizeLink(shoe.retailer_url, shoe.partnerize_camref, shoe.id);
+  const pz = partnerizeLink(shoe.retailer_url, effectiveCamref(shoe), shoe.id);
   if (pz) return pz;
 
   // 5. A Shopify discount code, if the sheet gives one for this row.
