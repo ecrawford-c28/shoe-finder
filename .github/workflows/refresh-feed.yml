@@ -1,0 +1,90 @@
+# Keeps prices, stock and the women's product mapping current.
+#
+# The SportsShoes feed is around 413MB and changes daily. Pulling it on a page
+# request would be absurd, and Vercel's function limits would not allow it
+# anyway, so it happens here instead: download, reduce to the ~11KB the site
+# needs, commit only if something actually changed.
+#
+# Requires one repository secret, SPORTSSHOES_FEED_URL, which is the Performance
+# Horizon feed link. It is a credential: anyone holding it can pull the feed, so
+# it lives in encrypted secrets and never in the repo.
+
+name: Refresh SportsShoes feed
+
+on:
+  schedule:
+    # 04:12 UTC. Off the hour on purpose: scheduled jobs pile up on the hour and
+    # get queued, and nothing here is time critical.
+    - cron: '12 4 * * *'
+  workflow_dispatch: {}
+
+permissions:
+  contents: write
+
+concurrency:
+  group: refresh-feed
+  cancel-in-progress: true
+
+jobs:
+  refresh:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+
+      - name: Download the feed
+        env:
+          FEED_URL: ${{ secrets.SPORTSSHOES_FEED_URL }}
+        run: |
+          if [ -z "$FEED_URL" ]; then
+            echo "SPORTSSHOES_FEED_URL is not set. Add it under Settings, Secrets and variables, Actions."
+            exit 1
+          fi
+          curl -fsSL --retry 3 --retry-delay 10 --max-time 900 -o /tmp/feed.csv "$FEED_URL"
+          ls -la /tmp/feed.csv
+
+      - name: Sanity check the download
+        run: |
+          # A truncated or error-page download must not be allowed to wipe the
+          # site's stock data, so refuse anything that is not plausibly the feed.
+          SIZE=$(stat -c%s /tmp/feed.csv)
+          echo "downloaded $SIZE bytes"
+          if [ "$SIZE" -lt 50000000 ]; then
+            echo "Feed is implausibly small. Refusing to regenerate."
+            exit 1
+          fi
+          head -1 /tmp/feed.csv | grep -q '"id","title"' || {
+            echo "Header does not look like the product feed. Refusing to regenerate."
+            exit 1
+          }
+
+      - name: Regenerate the data file
+        run: |
+          python3 nmfr/scripts/extract-feed.py \
+            /tmp/feed.csv \
+            nmfr/running-shoes-database.csv \
+            nmfr/data/feed.js
+
+      - name: Refuse a result that would empty the site
+        run: |
+          MATCHED=$(grep -o '"matched": [0-9]*' nmfr/data/feed.js | head -1 | grep -o '[0-9]*')
+          echo "matched $MATCHED shoes"
+          if [ "${MATCHED:-0}" -lt 40 ]; then
+            echo "Only $MATCHED shoes matched. That is too few to be real, so nothing is committed."
+            exit 1
+          fi
+
+      - name: Commit if anything changed
+        run: |
+          git config user.name "shoefinder-bot"
+          git config user.email "noreply@github.com"
+          if git diff --quiet -- nmfr/data/feed.js; then
+            echo "Prices and stock unchanged. Nothing to commit."
+            exit 0
+          fi
+          git add nmfr/data/feed.js
+          git commit -m "Refresh prices and stock from the SportsShoes feed"
+          git push
