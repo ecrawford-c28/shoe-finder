@@ -1,6 +1,8 @@
 // Scoring engine. Every rule that fires can also add a plain English reason,
 // so the results page can explain itself rather than looking like magic.
 
+import { isBuyable } from './feed.js';
+
 export const QUESTIONS = [
   {
     id: 'purpose',
@@ -13,6 +15,16 @@ export const QUESTIONS = [
       { value: 'speed_work', label: 'Getting faster', sub: 'Intervals, tempo, chasing a PB' },
       { value: 'race_day', label: 'Race day only', sub: 'The fast stuff for your goal race' },
       { value: 'walking', label: 'Walking, gym and the odd jog', sub: 'Not really running much' },
+    ],
+  },
+  {
+    id: 'gender',
+    title: 'Are you buying men\u2019s or women\u2019s shoes?',
+    help: 'Most running shoes come in both, built on a different last. It changes the fit, not the advice.',
+    options: [
+      { value: 'men', label: 'Men\u2019s' },
+      { value: 'women', label: 'Women\u2019s' },
+      { value: 'either', label: 'Not fussed', sub: 'Show me whatever fits best' },
     ],
   },
   {
@@ -178,7 +190,9 @@ function cheaperSiblingOf(shoe, shoes) {
       s =>
         s.family === shoe.family &&
         s.id !== shoe.id &&
-        s.status === 'outgoing'
+        s.status === 'outgoing' &&
+        // No point pointing someone at last year's model if it has sold out.
+        isBuyable(s)
     ) || null
   );
 }
@@ -266,7 +280,11 @@ export function scoreShoes(shoes, a, limit = 5, opts = {}) {
 
   // A straight no on plates is a real filter, not a nudge. There are plenty of
   // quick unplated shoes left, so this never leaves the list thin.
-  const pool = a.plate === 'no' ? shoes.filter(s => s.plate === 'none') : shoes;
+  // A shoe with no stock behind it should never reach a results page, however
+  // well it fits. This is applied before scoring rather than after, so the list
+  // fills up with shoes someone can actually buy instead of ending up short.
+  const sellable = shoes.filter(isBuyable);
+  const pool = a.plate === 'no' ? sellable.filter(s => s.plate === 'none') : sellable;
   // Worked out once against the whole pool, not per shoe, so every shoe is
   // measured on the same scale. Null until the feed carries ratings.
   const ratingCtx = ratingStats(pool);

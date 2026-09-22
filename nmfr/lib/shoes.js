@@ -1,4 +1,5 @@
 import fallbackCsv, { FALLBACK_ROWS } from '../data/fallback.js';
+import { retailerUrlFor } from './feed.js';
 
 // Ed's Google Sheet, exported as CSV. Requires the sheet to be set to
 // "Anyone with the link can view". No gid, so it always exports the first tab.
@@ -199,27 +200,28 @@ export function shopifyDiscountLink(destinationUrl, code) {
   return `${u.origin}/discount/${code}?redirect=${encodeURIComponent(target)}`;
 }
 
-export function buyUrl(shoe) {
+export function buyUrl(shoe, gender) {
   // 1. An explicit affiliate_url in the sheet always wins, for anything the
   //    builders below cannot express.
   if (shoe.affiliate_url) return shoe.affiliate_url;
+  const dest = retailerUrlFor(shoe, gender);
 
   // 2. Awin, if the sheet gives an advertiser ID for this row.
-  const awin = awinLink(shoe.retailer_url, shoe.awin_mid, shoe.id);
+  const awin = awinLink(dest, shoe.awin_mid, shoe.id);
   if (awin) return awin;
 
   // 3. Webgains, if the sheet gives a programme ID for this row.
-  const wg = webgainsLink(shoe.retailer_url, shoe.wg_programid, shoe.id);
+  const wg = webgainsLink(dest, shoe.wg_programid, shoe.id);
   if (wg) return wg;
 
   // 4. Partnerize, if the sheet gives a campaign reference for this row.
-  const pz = partnerizeLink(shoe.retailer_url, effectiveCamref(shoe), shoe.id);
+  const pz = partnerizeLink(dest, effectiveCamref(shoe), shoe.id);
   if (pz) return pz;
 
   // 5. A Shopify discount code, if the sheet gives one for this row.
-  const disc = shopifyDiscountLink(shoe.retailer_url, shoe.discount_code);
+  const disc = shopifyDiscountLink(dest, shoe.discount_code);
   if (disc) return disc;
 
   // 6. Fall back to the plain retailer link.
-  return shoe.retailer_url || '';
+  return dest || '';
 }
