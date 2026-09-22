@@ -1,18 +1,19 @@
-// Generated from the SportsShoes product feed. Do not edit by hand: the daily
-// refresh overwrites this file wholesale.
+// Generated from the SportsShoes product feed. Do not edit by hand:
+// the daily refresh overwrites this file wholesale.
 //
-// The feed is ~413MB and carries one row per size. This is the residue of it
-// that the site actually needs: what each shoe costs today, whether any size is
-// in stock, and the product code of the women's listing where one exists.
+// The feed is ~413MB and carries one row per size. This is the residue
+// of it the site actually needs: what each shoe costs today, whether any
+// size is in stock, and the product code of the women's listing where
+// one exists.
 //
-// A shoe absent from here is absent from the retailer's catalogue, which the
-// site treats as unbuyable. See lib/shoes.js.
+// A shoe absent from here is absent from the retailer's catalogue, which
+// the site treats as unbuyable. See lib/feed.js.
 //
-// Generated: 2026-09-22T08:54:06Z
+// Generated: 2026-09-22T10:49:43Z
 // Matched: 96 of 104 shoes in the database.
 
 const feed = {
- "generated": "2026-09-22T08:54:06Z",
+ "generated": "2026-09-22T10:49:43Z",
  "matched": 96,
  "requested": 104,
  "shoes": {
