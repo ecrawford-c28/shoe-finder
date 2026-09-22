@@ -55,7 +55,11 @@ def main(feed_path, codes_path, out_path):
     agg = collections.defaultdict(lambda: {
         "sizes": 0, "in_stock": 0, "prices": [], "sales": [], "title": "", "gender": ""
     })
-    womens = {}   # model key -> code
+    # model key -> {women's code: sizes in stock}. Counting rather than taking
+    # the first listing matters: these are often several colourways deep and the
+    # first one in the feed is as likely as not to be the clearance colour with
+    # one size left. Sending a woman to that page is worse than not linking.
+    womens = collections.defaultdict(collections.Counter)
     ourkey = {}   # our code -> model key
 
     with open(feed_path, newline="", encoding="utf-8", errors="replace") as f:
@@ -81,8 +85,8 @@ def main(feed_path, codes_path, out_path):
                     a["title"], a["gender"] = title, gender
                     ourkey[code] = model_key(title)
             elif gender == "womens" and is_running:
-                # First listing wins. Later duplicates are usually colourways.
-                womens.setdefault(model_key(title), code)
+                tally = womens[model_key(title)]
+                tally[code] += 1 if row.get("availability") == "in_stock" else 0
 
     out = {}
     for code, a in agg.items():
@@ -99,7 +103,9 @@ def main(feed_path, codes_path, out_path):
         }
         wk = ourkey.get(code)
         if wk and wk in womens:
-            entry["womens"] = womens[wk]
+            # Deepest size range wins, and ties fall to whichever the feed
+            # listed first, so the same feed always produces the same file.
+            entry["womens"] = womens[wk].most_common(1)[0][0]
         out[code] = entry
 
     doc = {
