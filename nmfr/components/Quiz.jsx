@@ -3,6 +3,11 @@
 import { useState, useMemo, useEffect, useRef } from 'react';
 import { track } from '@vercel/analytics';
 import { QUESTIONS, visibleQuestions, scoreShoes, summarise, discountInfo } from '../lib/match';
+import { priceOf } from '../lib/feed';
+
+// Prices come from the feed as numbers. Trailing .00 reads as fake precision on
+// a price tag, so it goes.
+const money = n => Number(n).toFixed(2).replace('.00', '');
 
 const CAT_LABEL = {
   daily_trainer: 'Everyday trainer',
@@ -157,8 +162,10 @@ function Question({ q, brands, value, onPick, onNext, onBack, index, total }) {
   );
 }
 
-function ShoeCard({ entry, rank, size, clearWinner }) {
+function ShoeCard({ entry, rank, size, clearWinner, gender }) {
   const s = entry.shoe;
+  const genderParam = gender === 'women' ? '?g=women' : '';
+  const price = priceOf(s);
   const [imgOk, setImgOk] = useState(Boolean(s.image_url));
   const widthNote =
     s.widths.includes('extra_wide') ? '4E available' : s.widths.includes('wide') ? 'Wide fitting' : null;
@@ -182,21 +189,32 @@ function ShoeCard({ entry, rank, size, clearWinner }) {
       <div className="price">
         {deal && deal.payPrice ? (
           <>
-            £{deal.payPrice.toFixed(2).replace('.00', '')}{' '}
-            <s>£{Number(s.rrp_gbp).toFixed(2).replace('.00', '')}</s>
+            £{money(deal.payPrice)} <s>£{money(price.now)}</s>
+          </>
+        ) : price.was ? (
+          <>
+            £{money(price.now)} <s>£{money(price.was)}</s>{' '}
+            <span className="off">{price.percentOff}% off</span>
           </>
         ) : (
           <>
-            £{Number(s.rrp_gbp).toFixed(2).replace('.00', '')}{' '}
-            <span className="rrp-note">RRP, often less at the shop</span>
+            £{money(price.now)}{' '}
+            <span className="rrp-note">{price.live ? 'at SportsShoes' : 'RRP, often less at the shop'}</span>
           </>
         )}
       </div>
+      {/* Size depth matters more than the headline percentage. A half price shoe
+          that exists in one size sends most readers on a wasted trip. */}
+      {price.live && price.sizesInStock !== null && price.sizesInStock <= 3 ? (
+        <p className="stocklow">
+          Only {price.sizesInStock} {price.sizesInStock === 1 ? 'size' : 'sizes'} left at SportsShoes
+        </p>
+      ) : null}
       {entry.cheaperSibling ? (
         <p className="cheaper">
           Last year&apos;s <b>{entry.cheaperSibling.model}</b> is still available and usually
           discounted.{' '}
-          <a href={`/go/${entry.cheaperSibling.id}`} target="_blank" rel="nofollow sponsored noopener">
+          <a href={`/go/${entry.cheaperSibling.id}${genderParam}`} target="_blank" rel="nofollow sponsored noopener">
             Check the price
           </a>
           .
@@ -244,7 +262,7 @@ function ShoeCard({ entry, rank, size, clearWinner }) {
         {widthNote && <span>{widthNote}</span>}
         {s.plate !== 'none' && <span>{s.plate} plate</span>}
       </div>
-      <a className="btn" href={`/go/${s.id}`} target="_blank" rel="nofollow sponsored noopener">
+      <a className="btn" href={`/go/${s.id}${genderParam}`} target="_blank" rel="nofollow sponsored noopener">
         Buy at {s.retailer || 'SportsShoes'}
       </a>
       {s.review_url ? (
@@ -294,6 +312,7 @@ function Results({ answers, shoes, onRestart }) {
           rank={0}
           size={answers.size}
           clearWinner={clearWinner}
+          gender={answers.gender}
         />
         {top.length > 1 && (
           <div className="card-grid">
@@ -304,6 +323,7 @@ function Results({ answers, shoes, onRestart }) {
                 rank={i + 1}
                 size={answers.size}
                 clearWinner={clearWinner}
+                gender={answers.gender}
               />
             ))}
           </div>
@@ -320,7 +340,7 @@ function Results({ answers, shoes, onRestart }) {
             <h3 className="also">Also worth a look</h3>
             <div className="card-grid">
               {more.map(entry => (
-                <ShoeCard key={entry.shoe.id} entry={entry} rank={9} size={answers.size} />
+                <ShoeCard key={entry.shoe.id} entry={entry} rank={9} size={answers.size} gender={answers.gender} />
               ))}
             </div>
           </>
