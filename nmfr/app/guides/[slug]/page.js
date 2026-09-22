@@ -184,7 +184,7 @@ export default async function Guide({ params }) {
         </div>
         <div className="side-box">
           <h4>Get your own list</h4>
-          <p>Twelve questions, three shoes, and the reason for each one.</p>
+          <p>Thirteen questions, three shoes, and the reason for each one.</p>
           <a className="btn" href="/">
             Start the quiz
           </a>
