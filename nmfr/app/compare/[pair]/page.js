@@ -187,7 +187,7 @@ export default async function Compare({ params }) {
         </div>
         <div className="side-box">
           <h4>Not sure either is right?</h4>
-          <p>Twelve questions, three shoes, and the reason for each one.</p>
+          <p>Thirteen questions, three shoes, and the reason for each one.</p>
           <a className="btn" href="/">
             Start the quiz
           </a>
