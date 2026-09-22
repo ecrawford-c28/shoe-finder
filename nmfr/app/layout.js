@@ -14,7 +14,7 @@ export const metadata = {
   openGraph: {
     title: 'Which running shoes should you buy?',
     description:
-      'Eleven quick questions. Three shoes that actually suit you, and the reasons why. Free tool from Not Made For Running.',
+      'Thirteen quick questions. Three shoes that actually suit you, and the reasons why. Free tool from Not Made For Running.',
     url: 'https://shoefinder.co.uk',
     siteName: 'Shoe Finder',
     locale: 'en_GB',
@@ -23,7 +23,7 @@ export const metadata = {
   twitter: {
     card: 'summary_large_image',
     title: 'Which running shoes should you buy?',
-    description: 'Eleven quick questions. Three shoes that actually suit you.',
+    description: 'Thirteen quick questions. Three shoes that actually suit you.',
   },
   robots: { index: true, follow: true },
 };

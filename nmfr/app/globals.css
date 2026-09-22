@@ -461,3 +461,21 @@ input.text:focus { outline: none; border-color: var(--accent); }
 }
 .sfs .sfs-label:hover { color: var(--ink); }
 .sfs .sfs-n { font-size: 12px; color: var(--muted); }
+
+/* Live pricing from the retailer feed. */
+.price .off {
+  font-size: 12px;
+  font-weight: 700;
+  color: var(--accent-ink);
+  background: var(--accent);
+  border-radius: 999px;
+  padding: 3px 8px;
+  white-space: nowrap;
+}
+/* Size depth, not the headline percentage, is what decides whether a deal is
+   worth anyone's time. */
+.stocklow {
+  margin: -6px 0 12px;
+  font-size: 13px;
+  color: var(--warn);
+}
