@@ -43,7 +43,18 @@ jobs:
             echo "SPORTSSHOES_FEED_URL is not set. Add it under Settings, Secrets and variables, Actions."
             exit 1
           fi
-          curl -fsSL --retry 3 --retry-delay 10 --max-time 900 -o /tmp/feed.csv "$FEED_URL"
+          # --compressed asks for gzip and unpacks it. Some feed hosts compress
+          # regardless of what the request asks for, so the magic bytes are
+          # checked too rather than trusting headers: without this the job saves
+          # 16MB of gzip and calls it a CSV.
+          curl -fsSL --compressed --retry 3 --retry-delay 10 --max-time 900 -o /tmp/feed.raw "$FEED_URL"
+          if [ "$(head -c 2 /tmp/feed.raw | od -An -tx1 | tr -d ' \n')" = "1f8b" ]; then
+            echo "Response is gzip, decompressing."
+            gunzip -c /tmp/feed.raw > /tmp/feed.csv
+            rm /tmp/feed.raw
+          else
+            mv /tmp/feed.raw /tmp/feed.csv
+          fi
           ls -la /tmp/feed.csv
 
       - name: Sanity check the download
@@ -51,9 +62,11 @@ jobs:
           # A truncated or error-page download must not be allowed to wipe the
           # site's stock data, so refuse anything that is not plausibly the feed.
           SIZE=$(stat -c%s /tmp/feed.csv)
-          echo "downloaded $SIZE bytes"
+          ROWS=$(wc -l < /tmp/feed.csv)
+          echo "feed is $SIZE bytes across $ROWS rows"
+          echo "first line: $(head -c 120 /tmp/feed.csv)"
           if [ "$SIZE" -lt 50000000 ]; then
-            echo "Feed is implausibly small. Refusing to regenerate."
+            echo "Feed is implausibly small for a full catalogue. Refusing to regenerate."
             exit 1
           fi
           head -1 /tmp/feed.csv | grep -q '"id","title"' || {
