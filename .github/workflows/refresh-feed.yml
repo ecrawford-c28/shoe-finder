@@ -43,18 +43,28 @@ jobs:
             echo "SPORTSSHOES_FEED_URL is not set. Add it under Settings, Secrets and variables, Actions."
             exit 1
           fi
-          # --compressed asks for gzip and unpacks it. Some feed hosts compress
-          # regardless of what the request asks for, so the magic bytes are
-          # checked too rather than trusting headers: without this the job saves
-          # 16MB of gzip and calls it a CSV.
           curl -fsSL --compressed --retry 3 --retry-delay 10 --max-time 900 -o /tmp/feed.raw "$FEED_URL"
-          if [ "$(head -c 2 /tmp/feed.raw | od -An -tx1 | tr -d ' \n')" = "1f8b" ]; then
-            echo "Response is gzip, decompressing."
-            gunzip -c /tmp/feed.raw > /tmp/feed.csv
-            rm /tmp/feed.raw
-          else
-            mv /tmp/feed.raw /tmp/feed.csv
-          fi
+          # Performance Horizon serves this feed as a ZIP containing one CSV,
+          # whatever the URL extension suggests, and the member inside is named
+          # something like <hash>.csv_445519.tmp. The file is identified by its
+          # magic bytes rather than by its name or content type, because both
+          # lie here: the URL ends .csv and the payload is a zip archive.
+          MAGIC=$(head -c 4 /tmp/feed.raw | od -An -tx1 | tr -d ' \n')
+          case "$MAGIC" in
+            504b0304*)
+              echo "Response is a zip archive, extracting."
+              unzip -p /tmp/feed.raw > /tmp/feed.csv
+              ;;
+            1f8b*)
+              echo "Response is gzip, decompressing."
+              gunzip -c /tmp/feed.raw > /tmp/feed.csv
+              ;;
+            *)
+              echo "Response looks like plain text."
+              mv /tmp/feed.raw /tmp/feed.csv
+              ;;
+          esac
+          rm -f /tmp/feed.raw
           ls -la /tmp/feed.csv
 
       - name: Sanity check the download
