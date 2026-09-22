@@ -1,7 +1,7 @@
 // Scoring engine. Every rule that fires can also add a plain English reason,
 // so the results page can explain itself rather than looking like magic.
 
-import { isBuyable } from './feed.js';
+import { isBuyable, budgetPrice } from './feed.js';
 
 export const QUESTIONS = [
   {
@@ -299,14 +299,24 @@ export function scoreShoes(shoes, a, limit = 5, opts = {}) {
 
     // --- Surface -----------------------------------------------------------
     const isTrail = shoe.category === 'trail';
+    // Not every shoe sold as a trail shoe has grip worth the name. Some carry
+    // barely two millimetres of lug and are aimed at gravel and hard packed
+    // paths. Handing one of those to somebody who answered "hills and mud" is
+    // selling rather than recommending, so they are tagged hard_pack and scored
+    // apart: modest on trails, and the best thing on the page for mixed use.
+    const lightTrail = isTrail && shoe.best_for.includes('hard_pack');
     if (a.surface === 'trail') {
-      if (isTrail) { score += 55; why(9, 'Built for off road, with grip for mud and loose ground'); }
+      if (lightTrail) {
+        score += 8;
+        flags.push('the tread is shallow, so it will struggle once the ground turns soft');
+      } else if (isTrail) { score += 55; why(9, 'Built for off road, with grip for mud and loose ground'); }
       else score -= 200;
     } else if (a.surface === 'road') {
       if (isTrail) score -= 200;
       else score += 10;
     } else if (a.surface === 'mixed') {
-      if (isTrail && shoe.best_for.includes('easy_miles')) { score += 22; why(8, 'Copes with pavement as well as paths'); }
+      if (lightTrail) { score += 32; why(9, 'Made for exactly this: hard packed paths one day, pavement the next'); }
+      else if (isTrail && shoe.best_for.includes('easy_miles')) { score += 22; why(8, 'Copes with pavement as well as paths'); }
       else if (isTrail) score -= 35;
       else score += 8;
     } else {
@@ -438,16 +448,20 @@ export function scoreShoes(shoes, a, limit = 5, opts = {}) {
     }
 
     // --- Budget ------------------------------------------------------------
-    if (shoe.rrp_gbp > budget) {
-      const over = shoe.rrp_gbp - budget;
+    // Measured against today's price, not the list price. Comparing a budget to
+    // an RRP nobody is charging told people a shoe was too expensive while the
+    // page beside it showed a price they could afford.
+    const paid = budgetPrice(shoe);
+    if (paid > budget) {
+      const over = paid - budget;
       score -= over > 60 ? 220 : 95;
-      flags.push(`at £${Math.round(shoe.rrp_gbp)} it is over your budget, so watch for a sale`);
+      flags.push(`at £${Math.round(paid)} it is over your budget, so watch for a sale`);
     } else {
       score += 12;
       // Cheaper inside the budget is a mild plus, and it breaks ties sensibly.
-      score += Math.round((1 - shoe.rrp_gbp / Math.max(budget, 1)) * 9);
-      if (budget < 9000 && shoe.rrp_gbp <= budget * 0.7) {
-        why(2, `Well inside your budget at £${Math.round(shoe.rrp_gbp)}`);
+      score += Math.round((1 - paid / Math.max(budget, 1)) * 9);
+      if (budget < 9000 && paid <= budget * 0.7) {
+        why(2, `Well inside your budget at £${Math.round(paid)}`);
       }
     }
 
@@ -538,8 +552,8 @@ export function scoreShoes(shoes, a, limit = 5, opts = {}) {
         s.shoe.status === 'outgoing' &&
         !takenIds.has(s.shoe.id) &&
         !(s.shoe.family && takenFamilies.has(s.shoe.family)) &&
-        s.shoe.rrp_gbp > 0 &&
-        slot3.shoe.rrp_gbp - s.shoe.rrp_gbp >= MIN_SAVING_GBP &&
+        budgetPrice(s.shoe) > 0 &&
+        budgetPrice(slot3.shoe) - budgetPrice(s.shoe) >= MIN_SAVING_GBP &&
         slot3.score - s.score <= VALUE_PICK_MAX_GAP &&
         (brandTally[s.shoe.brand] || 0) < 2
     );

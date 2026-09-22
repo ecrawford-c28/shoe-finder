@@ -66,6 +66,19 @@ export function isPromotableDeal(shoe) {
   return p.percentOff >= 15 && (p.sizesInStock || 0) >= MIN_SIZES_TO_PROMOTE;
 }
 
+// What a shopper would actually hand over today, used for budget matching.
+//
+// A discount only counts if enough sizes carry it. Half price on the one size
+// left is not a price anyone can pay, and treating it as the shoe's cost would
+// push clearance stock onto results pages it has no business being on. The same
+// bar as isPromotableDeal, for the same reason: what the site says about a price
+// and what it does with that price should agree.
+export function budgetPrice(shoe) {
+  const p = priceOf(shoe);
+  const broad = p.was && (p.sizesInStock || 0) >= MIN_SIZES_TO_PROMOTE;
+  return (broad ? p.now : p.was || p.now) || Number((shoe && shoe.rrp_gbp) || 0);
+}
+
 // The women's listing of the same shoe, where the retailer has one.
 export function retailerUrlFor(shoe, gender) {
   const f = feedFor(shoe);
