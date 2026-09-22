@@ -16,7 +16,11 @@ export async function GET(request, { params }) {
   const { id } = await params;
   const { shoes } = await getShoes();
   const shoe = shoes.find(s => s.id === id);
-  const url = shoe ? buyUrl(shoe) : '';
+  // The quiz passes the answer through as ?g=, so a woman is sent to the
+  // women's listing of the shoe rather than the men's one. Anything other than
+  // an explicit "women" falls through to the default listing.
+  const gender = new URL(request.url).searchParams.get('g') === 'women' ? 'women' : 'men';
+  const url = shoe ? buyUrl(shoe, gender) : '';
   const target = url || new URL('/', request.url);
   return NextResponse.redirect(target, { status: 302, headers: HEADERS });
 }
