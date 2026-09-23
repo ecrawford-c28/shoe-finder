@@ -9,11 +9,11 @@
 // A shoe absent from here is absent from the retailer's catalogue, which
 // the site treats as unbuyable. See lib/feed.js.
 //
-// Generated: 2026-09-22T13:55:00Z
+// Generated: 2026-09-23T09:16:15Z
 // Matched: 107 of 113 shoes in the database.
 
 const feed = {
- "generated": "2026-09-22T13:55:00Z",
+ "generated": "2026-09-23T09:16:15Z",
  "matched": 107,
  "requested": 113,
  "shoes": {
@@ -50,7 +50,7 @@ const feed = {
    "sale": null,
    "sizes": 13,
    "inStock": 13,
-   "womens": "adi19419"
+   "womens": "adi19416"
   },
   "adi19062": {
    "price": 219.99,
@@ -119,7 +119,7 @@ const feed = {
    "price": 239.99,
    "sale": 137.99,
    "sizes": 18,
-   "inStock": 4
+   "inStock": 3
   },
   "asi16254": {
    "price": 114.99,
@@ -145,7 +145,7 @@ const feed = {
    "price": 199.99,
    "sale": null,
    "sizes": 16,
-   "inStock": 13
+   "inStock": 12
   },
   "asi16582": {
    "price": 179.99,
@@ -277,7 +277,7 @@ const feed = {
    "sale": 83.99,
    "sizes": 13,
    "inStock": 2,
-   "womens": "hok2960"
+   "womens": "hok3156"
   },
   "hok3382": {
    "price": 249.99,
@@ -331,7 +331,7 @@ const feed = {
    "price": 129.99,
    "sale": 116.99,
    "sizes": 15,
-   "inStock": 9,
+   "inStock": 8,
    "womens": "hok3772"
   },
   "ino2607": {
@@ -366,7 +366,7 @@ const feed = {
    "price": 179.99,
    "sale": 99.99,
    "sizes": 13,
-   "inStock": 8,
+   "inStock": 9,
    "womens": "mer3066"
   },
   "miz6717": {
@@ -381,7 +381,7 @@ const feed = {
    "sale": 134.99,
    "sizes": 13,
    "inStock": 12,
-   "womens": "miz6736"
+   "womens": "miz6735"
   },
   "miz6722": {
    "price": 139.99,
@@ -394,7 +394,7 @@ const feed = {
    "price": 139.99,
    "sale": 124.99,
    "sizes": 13,
-   "inStock": 10,
+   "inStock": 9,
    "womens": "miz6746"
   },
   "new695749": {
@@ -554,7 +554,7 @@ const feed = {
    "price": 154.99,
    "sale": 139.49,
    "sizes": 14,
-   "inStock": 4,
+   "inStock": 5,
    "womens": "nik25375"
   },
   "nik25774": {
@@ -657,7 +657,7 @@ const feed = {
    "price": 179.99,
    "sale": 107.99,
    "sizes": 15,
-   "inStock": 8,
+   "inStock": 7,
    "womens": "sau5210"
   },
   "sau5252": {
@@ -721,7 +721,7 @@ const feed = {
    "sale": 152.99,
    "sizes": 12,
    "inStock": 6,
-   "womens": "sau5643"
+   "womens": "sau5714"
   },
   "top35": {
    "price": 154.99,
