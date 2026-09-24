@@ -537,3 +537,22 @@ input.text:focus { outline: none; border-color: var(--accent); }
 .guide-list .price { font-weight: 700; font-size: 16px; margin: 0 0 8px; }
 .guide-list .price s { color: var(--muted); font-weight: 400; }
 .guide-list .price .rrp-note { color: var(--muted); font-weight: 400; font-size: 13px; }
+
+/* The deals listings get the same green button as the results cards, because a
+   deal is a buy decision and a text link reads like a footnote. Small rather
+   than full width: a deals page is a browse, so the button sits on one row
+   beside the review link instead of forming a wall of green down the page. */
+.dealbuy {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  flex-wrap: wrap;
+  margin: 14px 0 0;
+}
+.dealbuy .review-link {
+  font-size: 13px;
+  color: var(--muted);
+  text-decoration: underline;
+  text-underline-offset: 3px;
+}
+.dealbuy .review-link:hover { color: var(--ink); }

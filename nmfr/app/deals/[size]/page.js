@@ -166,20 +166,24 @@ export default async function DealsForSize({ params }) {
                     <p className="outgoing">Last year&apos;s model, which is why it is cheap.</p>
                   ) : null}
                   {d.shoe.one_liner && <p>{d.shoe.one_liner}</p>}
-                  <p className="guide-links">
+                  <p className="dealbuy">
                     <a
+                      className="btn small"
                       href={`/go/${d.shoe.id}${gender === 'women' ? '?g=women' : ''}`}
-                      rel="nofollow sponsored"
+                      target="_blank"
+                      rel="nofollow sponsored noopener"
                     >
-                      See it at {d.shoe.retailer}
+                      Buy at {d.shoe.retailer || 'SportsShoes'}
                     </a>
                     {d.shoe.review_url ? (
-                      <>
-                        {' · '}
-                        <a href={d.shoe.review_url} rel="nofollow" target="_blank">
-                          Lab review
-                        </a>
-                      </>
+                      <a
+                        className="review-link"
+                        href={d.shoe.review_url}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                      >
+                        Lab review
+                      </a>
                     ) : null}
                   </p>
                 </li>
