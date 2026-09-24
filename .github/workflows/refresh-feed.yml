@@ -89,7 +89,8 @@ jobs:
           python3 nmfr/scripts/extract-feed.py \
             /tmp/feed.csv \
             nmfr/running-shoes-database.csv \
-            nmfr/data/feed.js
+            nmfr/data/feed.js \
+            nmfr/data/sizes.js
 
       - name: Refuse a result that would empty the site
         run: |
@@ -104,10 +105,13 @@ jobs:
         run: |
           git config user.name "shoefinder-bot"
           git config user.email "noreply@github.com"
-          if git diff --quiet -- nmfr/data/feed.js; then
-            echo "Prices and stock unchanged. Nothing to commit."
+          # Both files, not just the first. Which sizes are in stock can change
+          # while the count stays the same, so checking feed.js alone would
+          # leave the deals pages stale for a day.
+          if git diff --quiet -- nmfr/data/feed.js nmfr/data/sizes.js; then
+            echo "Prices, stock and sizes unchanged. Nothing to commit."
             exit 0
           fi
-          git add nmfr/data/feed.js
+          git add nmfr/data/feed.js nmfr/data/sizes.js
           git commit -m "Refresh prices and stock from the SportsShoes feed"
           git push

@@ -66,6 +66,7 @@ export default function RootLayout({ children }) {
             </a>
             <nav className="mainnav">
               <a href="/">Take the quiz</a>
+              <a href="/deals">Deals</a>
               <a href="/guides">Guides</a>
               <a href="/how-it-works">How it works</a>
             </nav>
@@ -81,6 +82,7 @@ export default function RootLayout({ children }) {
           {children}
           <footer className="footer">
             <a href="/">Shoe finder</a>
+            <a href="/deals">Deals</a>
             <a href="/guides">Guides</a>
             <a href="/compare">Comparisons</a>
             <a href="/how-it-works">How it works</a>

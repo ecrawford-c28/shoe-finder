@@ -479,3 +479,61 @@ input.text:focus { outline: none; border-color: var(--accent); }
   font-size: 13px;
   color: var(--warn);
 }
+
+/* ---------- deals ---------- */
+/* A size is a one tap choice, so the tiles are big enough to hit on a phone
+   and carry the count, because a size with nothing in it should say so before
+   anyone clicks rather than after. */
+.sizegrid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(104px, 1fr));
+  gap: 8px;
+  margin: 14px 0 26px;
+}
+.sizetile {
+  display: block;
+  padding: 12px 10px;
+  border: 1px solid var(--line);
+  border-radius: 12px;
+  background: var(--bg-2);
+  text-decoration: none;
+  transition: border-color 0.12s ease, background 0.12s ease;
+}
+.sizetile:hover { border-color: var(--accent); background: var(--card); }
+.sizetile b { display: block; font-size: 19px; color: var(--ink); letter-spacing: -0.02em; }
+.sizetile span { display: block; font-size: 12px; color: var(--muted); margin-top: 2px; }
+.sizetile em { display: block; font-size: 12px; font-style: normal; color: var(--accent); margin-top: 3px; }
+.sizetile.empty { opacity: 0.45; }
+.sizetile.empty:hover { border-color: var(--line); background: var(--bg-2); }
+
+.sizelinks { display: flex; flex-wrap: wrap; gap: 6px; margin: 10px 0 24px; }
+.sizelink {
+  border: 1px solid var(--line);
+  border-radius: 999px;
+  padding: 5px 12px;
+  font-size: 14px;
+  color: var(--muted);
+  text-decoration: none;
+}
+.sizelink:hover { color: var(--ink); border-color: var(--accent); }
+.sizelink.here { background: var(--accent); color: var(--accent-ink); border-color: var(--accent); font-weight: 700; }
+
+.dealcount {
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--muted);
+  border: 1px solid var(--line);
+  border-radius: 999px;
+  padding: 2px 9px;
+  margin-left: 6px;
+  vertical-align: middle;
+}
+.headlinedeal {
+  border: 1px solid var(--accent);
+  border-radius: var(--radius);
+  padding: 14px 16px;
+  background: var(--bg-2);
+}
+.guide-list .price { font-weight: 700; font-size: 16px; margin: 0 0 8px; }
+.guide-list .price s { color: var(--muted); font-weight: 400; }
+.guide-list .price .rrp-note { color: var(--muted); font-weight: 400; font-size: 13px; }
