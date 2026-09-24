@@ -61,9 +61,10 @@ export default function Privacy() {
         If you arrived here from a link an influencer or reviewer shared, that link carries a short
         code naming who sent you. We keep that code in a cookie called <code>sf_ref</code> for
         thirty days so that if you buy something we can pay them their share. It holds nothing but
-        the code, it cannot be read by anything other than this site, and it tells us nothing about
-        who you are. Clearing your cookies removes it and the site works exactly the same without
-        it.
+        the code and tells us nothing about who you are. No other website can read the cookie, but
+        when you click a Buy button the code is passed to the affiliate network with the click,
+        because they are the ones who tell us the sale happened. Clearing your cookies removes it,
+        and the site works exactly the same without it.
       </p>
 
       <h2>Your rights</h2>
