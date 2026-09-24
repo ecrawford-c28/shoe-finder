@@ -18,7 +18,21 @@ const FEED = (feedData && feedData.shoes) || {};
 // Below this a "deal" is just noise: a pound or two off a full price shoe is
 // not a reason to build a page around it, and listing it makes the honest
 // discounts look weaker than they are.
-export const MIN_PERCENT_OFF = 10;
+//
+// It sat at 10 to begin with and that was too generous. The retailer discounts
+// a great deal of stock by exactly 10%, so the median size page carried 52
+// shoes and the median discount on it was 10%: a wall of token reductions with
+// the real 40 and 50 percent savings buried somewhere inside. Moving to 15
+// takes the median page to 12 shoes and costs no size its page. Going further
+// than 15 barely shortens anything and starts throwing away honest discounts,
+// so this is the number where the noise stops rather than a round figure.
+export const MIN_PERCENT_OFF = 15;
+
+// How many we actually put in front of somebody. A deals page is a decision,
+// and nobody makes one by reading fifty rows, so the page shows the deepest
+// five of whatever is currently selected and says plainly how many it is
+// choosing from.
+export const SHOW_TOP = 5;
 
 export const GENERATED = sizes.generated || null;
 

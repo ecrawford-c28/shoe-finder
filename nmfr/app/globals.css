@@ -556,3 +556,66 @@ input.text:focus { outline: none; border-color: var(--accent); }
   text-underline-offset: 3px;
 }
 .dealbuy .review-link:hover { color: var(--ink); }
+
+/* ---------- deals: the rethought size page ---------- */
+
+/* The best saving on the page, said once, above everything else. Somebody who
+   came here for a bargain should not have to scroll to find out how big it is. */
+.dealhero {
+  font-size: 18px;
+  line-height: 1.45;
+  margin: 0 0 8px;
+}
+.dealhero b { color: var(--accent); }
+
+/* Shoe type filter. Buttons rather than links: these are not separate pages, so
+   dressing them up as navigation would be a lie to both the visitor and Google. */
+.dealfilter {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 7px;
+  margin: 0 0 14px;
+}
+.dealchip {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  border: 1px solid var(--line);
+  background: transparent;
+  color: var(--muted);
+  border-radius: 999px;
+  padding: 8px 14px;
+  font-size: 14px;
+  font-family: inherit;
+  cursor: pointer;
+  transition: color .15s ease, border-color .15s ease, background .15s ease;
+}
+.dealchip i { font-style: normal; font-size: 12px; opacity: 0.7; }
+.dealchip:hover { color: var(--ink); border-color: var(--accent); }
+.dealchip.on {
+  background: var(--accent);
+  border-color: var(--accent);
+  color: var(--accent-ink);
+  font-weight: 700;
+}
+.dealchip.on i { opacity: 0.65; }
+
+/* What the list is currently showing, and out of how many. Saying it costs one
+   line and stops the five looking like the whole truth. */
+.dealscope {
+  font-size: 13px;
+  color: var(--muted);
+  margin: 0 0 4px;
+}
+
+/* The cards are the quiz's cards, so they inherit .card, .rank, .price, .specs
+   and the buy button wholesale rather than growing a parallel set of styles.
+   Two changes only: the rank slot carries the saving instead of a pick number,
+   and the photo is shorter because five of them stack where the quiz shows
+   three. */
+.dealcards { margin: 0 0 18px; }
+/* The saving pill hangs over the card's top edge, and the photo is the first
+   thing inside it, so the photo starts a little lower than the quiz's text does
+   to keep the two off each other. */
+.deal-img { height: 130px; margin: 8px 0 12px; }
+.dealcards .card .liner { margin: 0 0 12px; }

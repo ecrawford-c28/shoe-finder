@@ -6,9 +6,12 @@ import {
   dealSlug,
   dealsForSize,
   parseDealSlug,
+  CATEGORY_LABEL,
   GENERATED,
   MIN_PERCENT_OFF,
+  SHOW_TOP,
 } from '../../../lib/deals';
+import DealBoard from './DealBoard';
 
 export const revalidate = 300;
 
@@ -51,6 +54,12 @@ function money(n) {
   return `£${Number(n).toFixed(2).replace('.00', '')}`;
 }
 
+function widthNote(widths) {
+  if (widths.includes('extra_wide')) return '4E available';
+  if (widths.includes('wide')) return 'wide fitting';
+  return '';
+}
+
 export default async function DealsForSize({ params }) {
   const parsed = parseDealSlug(params.size);
   if (!parsed) notFound();
@@ -60,6 +69,46 @@ export default async function DealsForSize({ params }) {
 
   const who = gender === 'women' ? "women's" : "men's";
   const checked = GENERATED ? new Date(GENERATED) : null;
+  const g = gender === 'women' ? '?g=women' : '';
+
+  // One flat list, deepest discount first, because that is the order the page
+  // reads in now. Grouping moved into the filter: it was organising a wall of
+  // shoes rather than shortening it.
+  const flat = groups
+    .flatMap(gr => gr.deals)
+    .sort((a, b) => b.percentOff - a.percentOff || a.now - b.now);
+
+  // Only the fields the rows draw, so the shoe database does not ride along
+  // into the browser a second time.
+  const deals = flat.map(d => ({
+    id: d.shoe.id,
+    brand: d.shoe.brand,
+    model: d.shoe.model,
+    category: d.shoe.category,
+    typeLabel: CATEGORY_LABEL[d.shoe.category] || d.shoe.category,
+    now: d.now,
+    was: d.was,
+    saving: d.saving,
+    percentOff: d.percentOff,
+    sizesLeft: d.sizesLeft,
+    weight: d.shoe.weight_g || 0,
+    drop: d.shoe.drop_mm || 0,
+    width: widthNote(d.shoe.widths || []),
+    outgoing: d.shoe.status === 'outgoing',
+    oneLiner: d.shoe.one_liner || '',
+    retailer: d.shoe.retailer || 'SportsShoes',
+    reviewUrl: d.shoe.review_url || '',
+    image: d.shoe.image_url || '',
+    href: `/go/${d.shoe.id}${g}`,
+  }));
+
+  // Chips, in the order the shoe types matter rather than alphabetically, and
+  // only the ones that have something behind them today.
+  const types = groups.map(gr => ({
+    key: gr.category,
+    label: gr.label,
+    count: gr.deals.length,
+  }));
 
   const jsonLd = {
     '@context': 'https://schema.org',
@@ -68,15 +117,12 @@ export default async function DealsForSize({ params }) {
         '@type': 'ItemList',
         name: `Running shoe deals in ${who} UK ${size}`,
         numberOfItems: count,
-        itemListElement: groups
-          .flatMap(g => g.deals)
-          .slice(0, 30)
-          .map((d, i) => ({
-            '@type': 'ListItem',
-            position: i + 1,
-            name: `${d.shoe.brand} ${d.shoe.model}`,
-            url: `https://shoefinder.co.uk/deals/${params.size}`,
-          })),
+        itemListElement: deals.slice(0, 30).map((d, i) => ({
+          '@type': 'ListItem',
+          position: i + 1,
+          name: `${d.brand} ${d.model}`,
+          url: `https://shoefinder.co.uk/deals/${params.size}`,
+        })),
       },
       {
         '@type': 'BreadcrumbList',
@@ -99,14 +145,23 @@ export default async function DealsForSize({ params }) {
         <h1>Running shoe deals in {who} UK {size}</h1>
 
         {count ? (
-          <p>
-            {count === 1 ? 'One shoe' : `${count} shoes`} from the Shoe Finder database{' '}
-            {count === 1 ? 'is' : 'are'} discounted today and in stock in{' '}
-            {who} UK {size}. Biggest saving is {best.percentOff}% off the{' '}
-            {best.shoe.brand} {best.shoe.model}, and the cheapest thing here is {money(cheapest)}.
-            Anything under {MIN_PERCENT_OFF}% off is left out, because a couple of pounds is not a
-            deal.
-          </p>
+          <>
+            {/* The headline number, before anything else on the page. Somebody
+                who came here for a bargain should know the size of the best one
+                without scrolling. */}
+            <p className="dealhero">
+              Best today: <b>{best.percentOff}% off</b> the {best.shoe.brand}{' '}
+              {best.shoe.model}, down to {money(best.now)} from {money(best.was)}.
+            </p>
+            <p className="guide-specs">
+              {count === 1 ? 'One shoe' : `${count} shoes`} discounted and in stock in {who} UK{' '}
+              {size}, cheapest at {money(cheapest)}. Anything under {MIN_PERCENT_OFF}% off is left
+              out, because a couple of pounds is not a deal.
+              {checked
+                ? ` Prices come from the retailer's feed, last checked ${checked.toLocaleDateString('en-GB', { day: 'numeric', month: 'long' })} at ${checked.toLocaleTimeString('en-GB', { hour: '2-digit', minute: '2-digit', timeZone: 'UTC' })} UTC.`
+                : ''}
+            </p>
+          </>
         ) : (
           <p>
             Nothing in {who} UK {size} is discounted today. That is not a bug, it is just how the
@@ -116,81 +171,12 @@ export default async function DealsForSize({ params }) {
           </p>
         )}
 
-        <p className="guide-specs">
-          Prices come straight from the retailer&apos;s feed and are checked once a day
-          {checked ? `, last on ${checked.toLocaleDateString('en-GB', { day: 'numeric', month: 'long' })} at ${checked.toLocaleTimeString('en-GB', { hour: '2-digit', minute: '2-digit', timeZone: 'UTC' })} UTC` : ''}.
-          A deal can sell out before we notice.
-        </p>
-
-        <div className="disclosure" style={{ margin: '22px 0' }}>
+        <div className="disclosure" style={{ margin: '20px 0' }}>
           <b>Ad.</b> We earn a commission if you buy through the links below. It does not change
           what you pay, and it plays no part in which shoes are listed or how they are ordered.
         </div>
 
-        {groups.map(group => (
-          <section key={group.category}>
-            <h2 id={group.category}>
-              {group.label} <span className="dealcount">{group.deals.length}</span>
-            </h2>
-            <ol className="guide-list">
-              {group.deals.map(d => (
-                <li key={d.shoe.id}>
-                  {d.shoe.image_url ? (
-                    <img
-                      className="g-img"
-                      src={d.shoe.image_url}
-                      alt={`${d.shoe.brand} ${d.shoe.model}`}
-                      loading="lazy"
-                    />
-                  ) : null}
-                  <h3>
-                    {d.shoe.brand} {d.shoe.model}
-                  </h3>
-                  <p className="price">
-                    {money(d.now)} <s>{money(d.was)}</s>{' '}
-                    <span className="off">{d.percentOff}% off</span>{' '}
-                    <span className="rrp-note">save {money(d.saving)}</span>
-                  </p>
-                  <p className="guide-specs">
-                    {d.shoe.weight_g}g · {d.shoe.drop_mm}mm drop
-                    {d.shoe.stack_heel_mm ? ` · ${d.shoe.stack_heel_mm}mm stack` : ''}
-                    {d.shoe.widths.includes('extra_wide')
-                      ? ' · 4E available'
-                      : d.shoe.widths.includes('wide')
-                        ? ' · wide fitting'
-                        : ''}
-                    {d.shoe.plate !== 'none' ? ` · ${d.shoe.plate} plate` : ''}
-                    {d.sizesLeft <= 3 ? ` · only ${d.sizesLeft} sizes left` : ''}
-                  </p>
-                  {d.shoe.status === 'outgoing' ? (
-                    <p className="outgoing">Last year&apos;s model, which is why it is cheap.</p>
-                  ) : null}
-                  {d.shoe.one_liner && <p>{d.shoe.one_liner}</p>}
-                  <p className="dealbuy">
-                    <a
-                      className="btn small"
-                      href={`/go/${d.shoe.id}${gender === 'women' ? '?g=women' : ''}`}
-                      target="_blank"
-                      rel="nofollow sponsored noopener"
-                    >
-                      Buy at {d.shoe.retailer || 'SportsShoes'}
-                    </a>
-                    {d.shoe.review_url ? (
-                      <a
-                        className="review-link"
-                        href={d.shoe.review_url}
-                        target="_blank"
-                        rel="noopener noreferrer"
-                      >
-                        Lab review
-                      </a>
-                    ) : null}
-                  </p>
-                </li>
-              ))}
-            </ol>
-          </section>
-        ))}
+        {count ? <DealBoard deals={deals} types={types} showTop={SHOW_TOP} /> : null}
 
         <h2>Another size</h2>
         <p className="sizelinks">
