@@ -57,6 +57,15 @@ export default function Privacy() {
         recommendations come from the answers you give and the shoe database, nothing else.
       </p>
 
+      <p>
+        If you arrived here from a link an influencer or reviewer shared, that link carries a short
+        code naming who sent you. We keep that code in a cookie called <code>sf_ref</code> for
+        thirty days so that if you buy something we can pay them their share. It holds nothing but
+        the code, it cannot be read by anything other than this site, and it tells us nothing about
+        who you are. Clearing your cookies removes it and the site works exactly the same without
+        it.
+      </p>
+
       <h2>Your rights</h2>
       <p>
         Because we do not store personal data from the quiz, there is nothing for us to look up,
