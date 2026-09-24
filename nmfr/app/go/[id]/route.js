@@ -1,5 +1,6 @@
 import { NextResponse } from 'next/server';
 import { getShoes, buyUrl } from '../../../lib/shoes';
+import { REF_COOKIE } from '../../../lib/ref.js';
 
 // Short, because a stale affiliate link is worse than an extra sheet read.
 export const revalidate = 300;
@@ -20,7 +21,11 @@ export async function GET(request, { params }) {
   // women's listing of the shoe rather than the men's one. Anything other than
   // an explicit "women" falls through to the default listing.
   const gender = new URL(request.url).searchParams.get('g') === 'women' ? 'women' : 'men';
-  const url = shoe ? buyUrl(shoe, gender) : '';
+  // Set by the middleware when the visitor arrived through an influencer link.
+  // It is httpOnly, so it is read here and nowhere in the browser, which keeps
+  // it out of the page HTML along with the affiliate URL itself.
+  const ref = request.cookies.get(REF_COOKIE)?.value || '';
+  const url = shoe ? buyUrl(shoe, gender, ref) : '';
   const target = url || new URL('/', request.url);
   return NextResponse.redirect(target, { status: 302, headers: HEADERS });
 }

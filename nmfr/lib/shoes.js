@@ -200,25 +200,40 @@ export function shopifyDiscountLink(destinationUrl, code) {
   return `${u.origin}/discount/${code}?redirect=${encodeURIComponent(target)}`;
 }
 
-export function buyUrl(shoe, gender) {
+// What the network reports this click under. Normally just the shoe, so we can
+// see which shoes earn. When the visitor arrived through an influencer link the
+// handle goes in front, separated by a double underscore, because every network
+// here gives us exactly one free text field and we need two facts out of it.
+//
+// Splitting it back apart is a matter of taking everything before the first
+// "__", which is safe because the middleware that captures the handle collapses
+// any double underscore inside it.
+export function trackingRef(shoe, ref) {
+  return ref ? `${ref}__${shoe.id}` : shoe.id;
+}
+
+export function buyUrl(shoe, gender, ref) {
   // 1. An explicit affiliate_url in the sheet always wins, for anything the
-  //    builders below cannot express.
+  //    builders below cannot express. It carries its own tracking, so an
+  //    influencer ref cannot be attached and this shoe will report unattributed.
   if (shoe.affiliate_url) return shoe.affiliate_url;
   const dest = retailerUrlFor(shoe, gender);
+  const tag = trackingRef(shoe, ref);
 
   // 2. Awin, if the sheet gives an advertiser ID for this row.
-  const awin = awinLink(dest, shoe.awin_mid, shoe.id);
+  const awin = awinLink(dest, shoe.awin_mid, tag);
   if (awin) return awin;
 
   // 3. Webgains, if the sheet gives a programme ID for this row.
-  const wg = webgainsLink(dest, shoe.wg_programid, shoe.id);
+  const wg = webgainsLink(dest, shoe.wg_programid, tag);
   if (wg) return wg;
 
   // 4. Partnerize, if the sheet gives a campaign reference for this row.
-  const pz = partnerizeLink(dest, effectiveCamref(shoe), shoe.id);
+  const pz = partnerizeLink(dest, effectiveCamref(shoe), tag);
   if (pz) return pz;
 
-  // 5. A Shopify discount code, if the sheet gives one for this row.
+  // 5. A Shopify discount code, if the sheet gives one for this row. There is
+  //    no tracking field in a discount URL, so these clicks cannot carry a ref.
   const disc = shopifyDiscountLink(dest, shoe.discount_code);
   if (disc) return disc;
 
