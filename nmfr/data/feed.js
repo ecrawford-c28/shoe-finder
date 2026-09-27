@@ -9,11 +9,11 @@
 // A shoe absent from here is absent from the retailer's catalogue, which
 // the site treats as unbuyable. See lib/feed.js.
 //
-// Generated: 2026-09-26T09:18:52Z
+// Generated: 2026-09-27T09:58:06Z
 // Matched: 106 of 113 shoes in the database.
 
 const feed = {
- "generated": "2026-09-26T09:18:52Z",
+ "generated": "2026-09-27T09:58:06Z",
  "matched": 106,
  "requested": 113,
  "shoes": {
@@ -85,7 +85,7 @@ const feed = {
    "sale": 121.49,
    "sizes": 12,
    "inStock": 11,
-   "womens": "alt1019"
+   "womens": "alt1020"
   },
   "alt1050": {
    "price": 129.99,
@@ -132,7 +132,7 @@ const feed = {
    "price": 169.99,
    "sale": 101.99,
    "sizes": 18,
-   "inStock": 16
+   "inStock": 14
   },
   "asi16456": {
    "price": 134.99,
@@ -207,8 +207,8 @@ const feed = {
    "price": 145,
    "sale": null,
    "sizes": 15,
-   "inStock": 15,
-   "womens": "bro3664"
+   "inStock": 14,
+   "womens": "bro3666"
   },
   "bro3473": {
    "price": 135,
@@ -250,7 +250,7 @@ const feed = {
    "sale": null,
    "sizes": 15,
    "inStock": 14,
-   "womens": "bro3689"
+   "womens": "bro3692"
   },
   "bro3657": {
    "price": 170,
@@ -277,7 +277,7 @@ const feed = {
    "sale": 83.99,
    "sizes": 13,
    "inStock": 2,
-   "womens": "hok3156"
+   "womens": "hok2960"
   },
   "hok3382": {
    "price": 249.99,
@@ -303,7 +303,7 @@ const feed = {
    "price": 159.99,
    "sale": null,
    "sizes": 16,
-   "inStock": 13,
+   "inStock": 12,
    "womens": "hok2857"
   },
   "hok3621": {
@@ -366,7 +366,7 @@ const feed = {
    "price": 179.99,
    "sale": 99.99,
    "sizes": 13,
-   "inStock": 8,
+   "inStock": 9,
    "womens": "mer3066"
   },
   "miz6717": {
@@ -408,7 +408,7 @@ const feed = {
    "price": 139.99,
    "sale": null,
    "sizes": 13,
-   "inStock": 8,
+   "inStock": 7,
    "womens": "new696935"
   },
   "new696206": {
@@ -540,7 +540,7 @@ const feed = {
    "price": 129.99,
    "sale": 103.99,
    "sizes": 14,
-   "inStock": 14,
+   "inStock": 13,
    "womens": "nik25804"
   },
   "nik25747": {
@@ -700,7 +700,7 @@ const feed = {
    "sale": 224.99,
    "sizes": 12,
    "inStock": 12,
-   "womens": "sau5639"
+   "womens": "sau5696"
   },
   "sau5603": {
    "price": 139.99,
