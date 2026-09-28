@@ -619,3 +619,31 @@ input.text:focus { outline: none; border-color: var(--accent); }
    to keep the two off each other. */
 .deal-img { height: 130px; margin: 8px 0 12px; }
 .dealcards .card .liner { margin: 0 0 12px; }
+
+/* ---------- the size picker ---------- */
+/* Twenty one sizes as full width rows is a scroll, and picking a size is a one
+   tap choice, so they go in a grid the way a shop's size run looks. */
+.sizepick {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(64px, 1fr));
+  gap: 8px;
+  margin: 4px 0 18px;
+}
+.sizeopt {
+  padding: 15px 4px;
+  border: 1px solid var(--line);
+  border-radius: 12px;
+  background: var(--card);
+  color: var(--ink);
+  font-family: inherit;
+  font-size: 16px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: border-color .15s ease, background .15s ease;
+}
+.sizeopt:hover { border-color: var(--accent); }
+.sizeopt.on { background: var(--accent); border-color: var(--accent); color: var(--accent-ink); }
+@media (max-width: 420px) {
+  .sizepick { grid-template-columns: repeat(auto-fill, minmax(56px, 1fr)); gap: 6px; }
+  .sizeopt { padding: 13px 2px; font-size: 15px; }
+}

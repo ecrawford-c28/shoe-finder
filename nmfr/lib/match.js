@@ -1,7 +1,7 @@
 // Scoring engine. Every rule that fires can also add a plain English reason,
 // so the results page can explain itself rather than looking like magic.
 
-import { isBuyable, budgetPrice } from './feed.js';
+import { isBuyable, budgetPrice, hasSize } from './feed.js';
 
 export const QUESTIONS = [
   {
@@ -145,8 +145,8 @@ export const QUESTIONS = [
   {
     id: 'size',
     title: 'Last one. What size do you take?',
-    help: 'UK sizing. This does not change the recommendation, it just goes on your results so you know what to order.',
-    freeText: true,
+    help: 'UK sizing. We will only recommend shoes the shop actually has in your size. Skip it and you get the full range.',
+    dynamic: 'sizes',
     optional: true,
   },
 ];
@@ -507,17 +507,37 @@ export function scoreShoes(shoes, a, limit = 5, opts = {}) {
   const brandCount = {};
   const seenFamily = new Set();
   const picked = [];
-  for (const s of scored) {
-    if (s.score < 0) continue;
-    const fam = s.shoe.family;
-    if (fam && seenFamily.has(fam)) continue;
-    const n = brandCount[s.shoe.brand] || 0;
-    if (n >= 2) continue;
-    if (fam) seenFamily.add(fam);
-    brandCount[s.shoe.brand] = n + 1;
-    picked.push(s);
-    if (picked.length >= limit) break;
-  }
+  const take = (from, outOfSize) => {
+    for (const s of from) {
+      if (picked.length >= limit) return;
+      if (s.score < 0) continue;
+      const fam = s.shoe.family;
+      if (fam && seenFamily.has(fam)) continue;
+      const n = brandCount[s.shoe.brand] || 0;
+      if (n >= 2) continue;
+      if (fam) seenFamily.add(fam);
+      brandCount[s.shoe.brand] = n + 1;
+      picked.push(outOfSize ? { ...s, outOfSize: true } : s);
+    }
+  };
+
+  // Recommending a shoe the shop cannot sell them is the same failure as
+  // recommending one that is delisted, so size comes first: in stock in their
+  // size, then everything else only if that leaves the page short.
+  //
+  // The filter is deliberately one sided. hasSize answers null when it does not
+  // know, because the feed is stale or the shoe predates the bitmask, and null
+  // counts as available. Wrongly hiding a good shoe is worse than letting an
+  // out of stock one through, and anything that slips through is labelled.
+  //
+  // The fallback exists because coverage collapses at the ends of the scale:
+  // men's UK 4 has three shoes in it and women's UK 11 has three. A hard filter
+  // there would hand those runners the same answer whatever they told us, which
+  // makes the quiz useless for exactly the people who most need it.
+  const wantSize = a.size ? Number(a.size) : null;
+  const fitsSize = s => !wantSize || hasSize(s.shoe, a.gender, wantSize) !== false;
+  take(wantSize ? scored.filter(fitsSize) : scored, false);
+  if (wantSize && picked.length < limit) take(scored.filter(s => !fitsSize(s)), true);
   // If filters were brutal, fall back to the raw ranking so we always answer.
   // Deduplicate families there too, otherwise the emergency path is the one
   // place a shoe could appear twice.
@@ -531,7 +551,10 @@ export function scoreShoes(shoes, a, limit = 5, opts = {}) {
           fams.add(s.shoe.family);
           return true;
         })
-        .slice(0, limit),
+        .slice(0, limit)
+        // This path ignores every filter on purpose, so anything it returns
+        // that is not in their size still has to say so.
+        .map(s => (fitsSize(s) ? s : { ...s, outOfSize: true })),
       shoes
     );
   }
@@ -555,10 +578,20 @@ export function scoreShoes(shoes, a, limit = 5, opts = {}) {
         budgetPrice(s.shoe) > 0 &&
         budgetPrice(slot3.shoe) - budgetPrice(s.shoe) >= MIN_SAVING_GBP &&
         slot3.score - s.score <= VALUE_PICK_MAX_GAP &&
-        (brandTally[s.shoe.brand] || 0) < 2
+        (brandTally[s.shoe.brand] || 0) < 2 &&
+        // Never swap an in size shoe out for a cheaper one they cannot buy.
+        (!slot3.outOfSize ? fitsSize(s) : true)
     );
     if (candidate) {
-      picked.splice(2, 0, { ...candidate, valuePick: true });
+      // The value pick bypassed the size pass entirely, so it has to be
+      // labelled here or it arrives on the page looking available. This bit
+      // was wrong first time round and only showed up at the ends of the size
+      // scale, where slot three is often out of size already.
+      picked.splice(2, 0, {
+        ...candidate,
+        valuePick: true,
+        ...(fitsSize(candidate) ? {} : { outOfSize: true }),
+      });
       picked.length = Math.min(picked.length, limit);
     }
   }

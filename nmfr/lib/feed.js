@@ -32,6 +32,49 @@ export function feedFor(shoe) {
   return FEED[productCode(shoe.retailer_url)] || null;
 }
 
+// UK sizes, as the bitmasks in data/feed.js index them. These two arrays are
+// mirrored in scripts/extract-feed.py and the two must not drift: shifting one
+// by a position would quietly tell somebody a shoe comes in their size when it
+// does not. If you change a scale here, change it there in the same commit.
+export const SIZE_SCALE = {
+  men: Array.from({ length: 21 }, (_, i) => 4 + 0.5 * i),     // 4 to 14
+  women: Array.from({ length: 18 }, (_, i) => 2.5 + 0.5 * i), // 2.5 to 11
+};
+
+// Whether this shoe is in stock in one size right now.
+//
+// Three ways to answer "I do not know", all of which mean "do not filter this
+// shoe out": the feed is missing or stale, this entry predates the bitmask, or
+// the size is off the end of the scale. Silence is never read as absence,
+// because the cost of wrongly hiding a good shoe is worse than the cost of
+// letting an out of stock one through, and the results already say plainly
+// when a size is not stocked.
+export function hasSize(shoe, gender, size) {
+  const f = feedFor(shoe);
+  if (!f) return null;
+  const women = gender === 'women';
+  const mask = women ? f.wfit : f.fit;
+  if (typeof mask !== 'number') return null;
+  const i = SIZE_SCALE[women ? 'women' : 'men'].indexOf(Number(size));
+  if (i < 0) return null;
+  return Boolean(mask & (1 << i));
+}
+
+// The sizes the site can actually offer someone, so the quiz asks about sizes
+// that exist rather than a hardcoded range. Falls back to the full scale when
+// the feed has no bitmasks yet.
+export function sizesOffered(gender) {
+  const women = gender === 'women';
+  const scale = SIZE_SCALE[women ? 'women' : 'men'];
+  let seen = 0;
+  for (const code of Object.keys(FEED)) {
+    const mask = women ? FEED[code].wfit : FEED[code].fit;
+    if (typeof mask === 'number') seen |= mask;
+  }
+  if (!seen) return scale;
+  return scale.filter((_, i) => seen & (1 << i));
+}
+
 // A shoe nobody can buy should never be recommended, however well it fits.
 // Absent from the feed counts as unbuyable: the feed lists everything the
 // retailer actually sells, so a missing entry means delisted. That is exactly

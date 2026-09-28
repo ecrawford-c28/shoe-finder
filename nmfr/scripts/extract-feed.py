@@ -40,6 +40,31 @@ def model_key(title):
     t = re.sub(r"[^a-z0-9 ]", " ", t)
     return re.sub(r"\s+", " ", t).strip()
 
+# Which UK sizes a listing is in stock in, packed into one integer so the quiz
+# can check availability in the browser. The alternative was shipping the whole
+# size list, which is 66KB at 217 shoes and would double what every visitor
+# downloads to answer a question most of them answer the same way.
+#
+# Bit n is set when the listing has size SCALE[n] in stock. These two scales are
+# mirrored in lib/feed.js and the two must not drift: a shift of one position
+# would quietly tell somebody a shoe comes in their size when it does not.
+MENS_SCALE = [4 + 0.5 * i for i in range(21)]     # 4 to 14
+WOMENS_SCALE = [2.5 + 0.5 * i for i in range(18)] # 2.5 to 11
+
+def size_mask(in_stock, scale):
+    """Pack a list of in-stock size strings into a bitmask over `scale`."""
+    have = set()
+    for s in in_stock:
+        try:
+            have.add(float(s))
+        except (TypeError, ValueError):
+            continue
+    mask = 0
+    for i, size in enumerate(scale):
+        if size in have:
+            mask |= 1 << i
+    return mask
+
 def size_key(s):
     """UK sizes are numeric, so sort them numerically. A stray non numeric
     size sorts last rather than blowing up the run."""
@@ -111,15 +136,17 @@ def main(feed_path, codes_path, out_path, sizes_path=None):
                 live = row.get("availability") == "in_stock"
                 tally = womens[model_key(title)]
                 tally[code] += 1 if live else 0
-                if sizes_path:
-                    d = wdetail[code]
-                    p, s_ = money(row.get("price")), money(row.get("sale_price"))
-                    if p: d["prices"].append(p)
-                    if s_: d["sales"].append(s_)
-                    if live:
-                        size = (row.get("size") or "").strip()
-                        if size:
-                            d["in"].append(size)
+                # Collected unconditionally now, not just when a sizes file is
+                # asked for: feed.js needs the women's size list too, to build
+                # the bitmask the quiz filters on.
+                d = wdetail[code]
+                p, s_ = money(row.get("price")), money(row.get("sale_price"))
+                if p: d["prices"].append(p)
+                if s_: d["sales"].append(s_)
+                if live:
+                    size = (row.get("size") or "").strip()
+                    if size:
+                        d["in"].append(size)
 
     out = {}
     for code, a in agg.items():
@@ -134,11 +161,21 @@ def main(feed_path, codes_path, out_path, sizes_path=None):
             "sizes": a["sizes"],
             "inStock": a["in_stock"],
         }
+        # Which sizes this listing actually has, for the quiz's size filter.
+        # Omitted when zero, so a shoe with nothing in stock does not carry a
+        # meaningless field.
+        fit = size_mask(a["in"], MENS_SCALE)
+        if fit:
+            entry["fit"] = fit
         wk = ourkey.get(code)
         if wk and wk in womens:
             # Deepest size range wins, and ties fall to whichever the feed
             # listed first, so the same feed always produces the same file.
-            entry["womens"] = womens[wk].most_common(1)[0][0]
+            wcode = womens[wk].most_common(1)[0][0]
+            entry["womens"] = wcode
+            wfit = size_mask(wdetail.get(wcode, {}).get("in", []), WOMENS_SCALE)
+            if wfit:
+                entry["wfit"] = wfit
         out[code] = entry
 
     doc = {
@@ -154,8 +191,9 @@ def main(feed_path, codes_path, out_path, sizes_path=None):
         "//\n"
         "// The feed is ~413MB and carries one row per size. This is the residue\n"
         "// of it the site actually needs: what each shoe costs today, whether any\n"
-        "// size is in stock, and the product code of the women's listing where\n"
-        "// one exists.\n"
+        "// size is in stock, the product code of the women's listing where one\n"
+        "// exists, and which UK sizes each listing has, packed into a bitmask\n"
+        "// so the quiz can filter by size without downloading the size lists.\n"
         "//\n"
         "// A shoe absent from here is absent from the retailer's catalogue, which\n"
         "// the site treats as unbuyable. See lib/feed.js.\n"

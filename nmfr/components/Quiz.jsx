@@ -3,7 +3,7 @@
 import { useState, useMemo, useEffect, useRef } from 'react';
 import { track } from '@vercel/analytics';
 import { QUESTIONS, visibleQuestions, scoreShoes, summarise, discountInfo } from '../lib/match';
-import { priceOf } from '../lib/feed';
+import { priceOf, sizesOffered } from '../lib/feed';
 
 // Prices come from the feed as numbers. Trailing .00 reads as fake precision on
 // a price tag, so it goes.
@@ -71,9 +71,19 @@ function Intro({ onStart, count, questions, sample }) {
   );
 }
 
-function Question({ q, brands, value, onPick, onNext, onBack, index, total }) {
+function Question({ q, brands, gender, value, onPick, onNext, onBack, index, total }) {
   const [text, setText] = useState(value || '');
-  const options = q.dynamic === 'brands' ? brands.map(b => ({ value: b, label: b })) : q.options || [];
+  // Sizes come from the feed rather than a hardcoded range, so the list only
+  // ever offers sizes the shop stocks something in. Women's and men's scales
+  // differ, and the gender question is answered long before this one.
+  const sizeOpts = useMemo(
+    () => sizesOffered(gender).map(v => ({ value: String(v), label: String(v) })),
+    [gender]
+  );
+  const options =
+    q.dynamic === 'brands' ? brands.map(b => ({ value: b, label: b }))
+    : q.dynamic === 'sizes' ? sizeOpts
+    : q.options || [];
   const selected = q.multi ? (Array.isArray(value) ? value : []) : value;
 
   const toggle = v => {
@@ -141,6 +151,28 @@ function Question({ q, brands, value, onPick, onNext, onBack, index, total }) {
             </button>
           </div>
         </>
+      ) : q.dynamic === 'sizes' ? (
+        <>
+          <div className="sizepick">
+            {options.map(o => (
+              <button
+                key={o.value}
+                className={`sizeopt${selected === o.value ? ' on' : ''}`}
+                onClick={() => {
+                  onPick(o.value);
+                  setTimeout(onNext, 120);
+                }}
+              >
+                {o.label}
+              </button>
+            ))}
+          </div>
+          <div className="actions">
+            <button className="btn ghost" onClick={onNext}>
+              {selected ? 'See my shoes' : 'Skip, show me everything'}
+            </button>
+          </div>
+        </>
       ) : (
         <div className="opts">
           {options.map(o => (
@@ -184,6 +216,14 @@ function ShoeCard({ entry, rank, size, clearWinner, gender }) {
         />
       ) : null}
       <div className="card-body">
+      {/* Shown only when the size filter could not fill the page from stock in
+          their size. Saying it plainly beats quietly dropping the shoe, because
+          at the ends of the size scale there is often nothing else to offer. */}
+      {entry.outOfSize ? (
+        <p className="warn" style={{ marginTop: 0 }}>
+          Not in UK {size} at the moment. Shown because little else fits what you asked for.
+        </p>
+      ) : null}
       <div className="brand">{s.brand}</div>
       <h3>{s.model}</h3>
       <div className="price">
@@ -270,7 +310,7 @@ function ShoeCard({ entry, rank, size, clearWinner, gender }) {
           Read the lab review at RunRepeat
         </a>
       ) : null}
-      {size ? (
+      {size && !entry.outOfSize ? (
         <p className="meta" style={{ fontSize: 13, color: '#6f6f7c', marginTop: 12, marginBottom: 0 }}>
           Ask for {size}
           {widthNote ? ` in a ${s.widths.includes('extra_wide') ? '4E' : 'wide'} fitting` : ''}.
@@ -465,6 +505,7 @@ export default function Quiz({ shoes, brands, sample }) {
           key={q.id}
           q={q}
           brands={brands}
+          gender={answers.gender}
           value={answers[q.id]}
           onPick={pick}
           onNext={next}
