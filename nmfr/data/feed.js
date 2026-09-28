@@ -9,11 +9,11 @@
 // A shoe absent from here is absent from the retailer's catalogue, which
 // the site treats as unbuyable. See lib/feed.js.
 //
-// Generated: 2026-09-27T09:58:06Z
+// Generated: 2026-09-28T10:49:44Z
 // Matched: 106 of 113 shoes in the database.
 
 const feed = {
- "generated": "2026-09-27T09:58:06Z",
+ "generated": "2026-09-28T10:49:44Z",
  "matched": 106,
  "requested": 113,
  "shoes": {
@@ -207,8 +207,8 @@ const feed = {
    "price": 145,
    "sale": null,
    "sizes": 15,
-   "inStock": 14,
-   "womens": "bro3666"
+   "inStock": 15,
+   "womens": "bro3665"
   },
   "bro3473": {
    "price": 135,
@@ -235,7 +235,7 @@ const feed = {
    "price": 135,
    "sale": null,
    "sizes": 15,
-   "inStock": 13,
+   "inStock": 14,
    "womens": "bro3581"
   },
   "bro3648": {
@@ -263,7 +263,7 @@ const feed = {
    "price": 240,
    "sale": null,
    "sizes": 17,
-   "inStock": 15
+   "inStock": 14
   },
   "bro3728": {
    "price": 100,
@@ -304,7 +304,7 @@ const feed = {
    "sale": null,
    "sizes": 16,
    "inStock": 12,
-   "womens": "hok2857"
+   "womens": "hok3764"
   },
   "hok3621": {
    "price": 159.99,
@@ -345,7 +345,7 @@ const feed = {
    "price": 149.99,
    "sale": 79.99,
    "sizes": 13,
-   "inStock": 12,
+   "inStock": 11,
    "womens": "ino2647"
   },
   "mer2744": {
@@ -366,7 +366,7 @@ const feed = {
    "price": 179.99,
    "sale": 99.99,
    "sizes": 13,
-   "inStock": 9,
+   "inStock": 8,
    "womens": "mer3066"
   },
   "miz6717": {
@@ -437,7 +437,7 @@ const feed = {
    "sale": 47.99,
    "sizes": 13,
    "inStock": 12,
-   "womens": "new696792"
+   "womens": "new696795"
   },
   "new696297": {
    "price": 149.99,
@@ -465,7 +465,7 @@ const feed = {
    "sale": null,
    "sizes": 13,
    "inStock": 13,
-   "womens": "new696893"
+   "womens": "new696794"
   },
   "new696844": {
    "price": 109.99,
@@ -541,7 +541,7 @@ const feed = {
    "sale": 103.99,
    "sizes": 14,
    "inStock": 13,
-   "womens": "nik25804"
+   "womens": "nik26077"
   },
   "nik25747": {
    "price": 239.99,
@@ -562,7 +562,7 @@ const feed = {
    "sale": 107.99,
    "sizes": 14,
    "inStock": 14,
-   "womens": "nik25782"
+   "womens": "nik26075"
   },
   "nik25775": {
    "price": 154.99,
@@ -575,7 +575,7 @@ const feed = {
    "price": 229.99,
    "sale": null,
    "sizes": 12,
-   "inStock": 7
+   "inStock": 6
   },
   "onr857": {
    "price": 179.99,
@@ -700,7 +700,7 @@ const feed = {
    "sale": 224.99,
    "sizes": 12,
    "inStock": 12,
-   "womens": "sau5696"
+   "womens": "sau5639"
   },
   "sau5603": {
    "price": 139.99,
@@ -714,13 +714,13 @@ const feed = {
    "sale": 152.99,
    "sizes": 12,
    "inStock": 5,
-   "womens": "sau5714"
+   "womens": "sau5713"
   },
   "top35": {
    "price": 154.99,
    "sale": null,
    "sizes": 11,
-   "inStock": 11,
+   "inStock": 9,
    "womens": "top39"
   },
   "top46": {
