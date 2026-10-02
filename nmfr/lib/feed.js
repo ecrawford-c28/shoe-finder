@@ -22,7 +22,7 @@ const FEED = (feedData && feedData.shoes) || {};
 export const FEED_OK = Object.keys(FEED).length > 20;
 export const FEED_GENERATED = (feedData && feedData.generated) || null;
 
-const productCode = url => {
+export const productCode = url => {
   const m = /\/product\/([^/?]+)/.exec(url || '');
   return m ? m[1] : '';
 };

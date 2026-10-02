@@ -1,8 +1,10 @@
 import { GUIDES } from '../lib/guides';
-import { ALL_PAIR_SLUGS } from '../lib/compare';
+import { livePairSlugs } from '../lib/compare';
+import { getShoes } from '../lib/shoes';
 import { allDealSlugs } from '../lib/deals';
 
-export default function sitemap() {
+export default async function sitemap() {
+  const { shoes } = await getShoes();
   const base = 'https://shoefinder.co.uk';
   const routes = ['', '/how-it-works', '/privacy', '/terms', '/contact', '/guides', '/compare', '/deals'];
   const pages = routes.map(path => ({
@@ -15,7 +17,7 @@ export default function sitemap() {
     changeFrequency: 'weekly',
     priority: 0.8,
   }));
-  const compares = ALL_PAIR_SLUGS.map(slug => ({
+  const compares = livePairSlugs(shoes).map(slug => ({
     url: `${base}/compare/${slug}`,
     changeFrequency: 'weekly',
     priority: 0.7,
