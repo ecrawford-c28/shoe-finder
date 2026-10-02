@@ -1,5 +1,6 @@
 import { getShoes } from '../../lib/shoes';
 import { dealCounts, dealsForSize, GENERATED, MIN_PERCENT_OFF } from '../../lib/deals';
+import { DEFAULT_QUESTION_COUNT } from '../../lib/match';
 
 export const revalidate = 300;
 
@@ -73,7 +74,7 @@ export default async function Deals() {
       <div className="guide-main">
         <h1>Running shoe deals, by size</h1>
         <p>
-          The quiz asks eleven questions and picks shoes that suit you. This does the opposite and
+          The quiz asks {DEFAULT_QUESTION_COUNT} questions and picks shoes that suit you. This does the opposite and
           asks one: what size are you? Then it shows what is discounted today and actually in stock
           in that size, which is the bit most deal pages skip.
         </p>

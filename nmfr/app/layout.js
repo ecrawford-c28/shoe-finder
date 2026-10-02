@@ -2,6 +2,7 @@ import './globals.css';
 import { Analytics } from '@vercel/analytics/next';
 import Script from 'next/script';
 import localFont from 'next/font/local';
+import { DEFAULT_QUESTION_COUNT } from '../lib/match';
 
 // The font files live in the repo (app/fonts, with their OFL licences) rather
 // than coming from Google Fonts through next/font, which fetches at build time.
@@ -45,7 +46,7 @@ export const metadata = {
   openGraph: {
     title: 'Which running shoes should you buy?',
     description:
-      'Thirteen quick questions. Three shoes that actually suit you, and the reasons why. Free tool from Not Made For Running.',
+      `${DEFAULT_QUESTION_COUNT} quick questions. Three shoes that actually suit you, and the reasons why. Free tool from Not Made For Running.`,
     url: 'https://shoefinder.co.uk',
     siteName: 'Shoe Finder',
     locale: 'en_GB',
@@ -54,7 +55,7 @@ export const metadata = {
   twitter: {
     card: 'summary_large_image',
     title: 'Which running shoes should you buy?',
-    description: 'Thirteen quick questions. Three shoes that actually suit you.',
+    description: `${DEFAULT_QUESTION_COUNT} quick questions. Three shoes that actually suit you.`,
   },
   robots: { index: true, follow: true },
 };
@@ -73,7 +74,7 @@ const jsonLd = {
   applicationCategory: 'LifestyleApplication',
   operatingSystem: 'Any',
   description:
-    'A free running shoe recommendation quiz. Eleven questions on fit, weight, pronation and purpose, then three matched shoes with the reasoning behind each one.',
+    `A free running shoe recommendation quiz. ${DEFAULT_QUESTION_COUNT} questions on fit, weight, pronation and purpose, then three matched shoes with the reasoning behind each one.`,
   offers: { '@type': 'Offer', price: '0', priceCurrency: 'GBP' },
   author: { '@type': 'Organization', name: 'Not Made For Running' },
   inLanguage: 'en-GB',
