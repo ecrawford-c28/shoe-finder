@@ -1,5 +1,5 @@
 import fallbackCsv, { FALLBACK_ROWS } from '../data/fallback.js';
-import { retailerUrlFor } from './feed.js';
+import { retailerUrlFor, productCode } from './feed.js';
 
 // Ed's Google Sheet, exported as CSV. Requires the sheet to be set to
 // "Anyone with the link can view". No gid, so it always exports the first tab.
@@ -37,7 +37,7 @@ const slug = s => String(s).toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/^
 function rowsToShoes(rows) {
   if (!rows.length) return [];
   const head = rows[0].map(h => h.trim().toLowerCase().replace(/\s+/g, '_'));
-  return rows.slice(1).map(r => {
+  const shoes = rows.slice(1).map(r => {
     const o = {};
     head.forEach((h, i) => { o[h] = r[i] ?? ''; });
     if (!o.brand || !o.model) return null;
@@ -81,6 +81,36 @@ function rowsToShoes(rows) {
       family: (o.family || '').trim().toLowerCase(),
     };
   }).filter(Boolean).filter(s => s.status !== 'hidden' && s.status !== 'superseded');
+  return uniqueIds(shoes);
+}
+
+// The retailer sometimes lists one shoe twice, a new colourway beside the old,
+// and both rows then carry the same brand and model, so the same id. Anything
+// that looks a shoe up by id, the /go redirect most of all, would quietly take
+// whichever row came first and send a buyer to the wrong listing.
+//
+// Within a clash the smallest product code keeps the bare id and the rest get
+// their product code appended. Chosen by product code rather than row order so
+// that re-sorting the sheet can never swap which listing an id points at. Every
+// shoe without a clash keeps exactly the id it had.
+function uniqueIds(shoes) {
+  const byId = new Map();
+  for (const s of shoes) byId.set(s.id, [...(byId.get(s.id) || []), s]);
+  for (const [id, group] of byId) {
+    if (group.length < 2) continue;
+    const ranked = group
+      .map(s => ({ s, code: productCode(s.retailer_url) }))
+      .sort((a, b) => (a.code < b.code ? -1 : a.code > b.code ? 1 : 0));
+    for (const { s, code } of ranked.slice(1)) {
+      if (!code) {
+        // Nothing stable to tell it apart by. Left clashing, but said out loud.
+        console.warn(`Shoe id ${id} is shared and one row has no product code to separate it`);
+        continue;
+      }
+      s.id = `${id}-${slug(code)}`;
+    }
+  }
+  return shoes;
 }
 
 export async function getShoes() {

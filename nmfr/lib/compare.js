@@ -15,7 +15,7 @@ export const PAIRS = [
   ['hoka-clifton-11', 'nike-pegasus-42'],
   ['asics-novablast-6', 'saucony-ride-19'],
   ['asics-novablast-6', 'nike-pegasus-42'],
-  ['new-balance-fresh-foam-x-1080v15', 'hoka-clifton-11'],
+  ['new-balance-1080v15', 'hoka-clifton-11'],
   ['saucony-ride-19', 'brooks-ghost-18'],
   ['adidas-supernova-rise-3', 'nike-pegasus-42'],
   ['puma-velocity-nitro-5', 'brooks-launch-12'],
@@ -45,9 +45,9 @@ export const PAIRS = [
   ['new-balance-fuelcell-rebel-v5', 'hoka-mach-7'],
 
   // Race day
-  ['nike-vaporfly-4', 'nike-alphafly-3'],
-  ['nike-vaporfly-4', 'asics-metaspeed-sky-tokyo'],
-  ['adidas-adizero-adios-pro-4', 'nike-vaporfly-4'],
+  ['nike-zoomx-vaporfly-next-4', 'nike-air-zoom-alphafly-next-3'],
+  ['nike-zoomx-vaporfly-next-4', 'asics-metaspeed-sky-tokyo'],
+  ['adidas-adizero-adios-pro-4', 'nike-zoomx-vaporfly-next-4'],
 
   // Trail
   ['saucony-peregrine-16', 'salomon-speedcross-6'],
@@ -57,6 +57,28 @@ export const PAIRS = [
 export const pairSlug = (a, b) => `${a}-vs-${b}`;
 
 export const ALL_PAIR_SLUGS = PAIRS.map(([a, b]) => pairSlug(a, b));
+
+// The pairs that can actually be rendered today: both shoes still in the
+// database. The sitemap and the prerendered pages both come from this, so the
+// sitemap can never list a comparison the site would 404 on. That happened when
+// four shoes were renamed and their hand written slugs here went stale.
+//
+// A dropped pair is logged rather than skipped quietly, so a rename that breaks
+// one shows up in the build log. Each is said once, however many callers ask.
+const warned = new Set();
+export function livePairSlugs(shoes) {
+  const ids = new Set(shoes.map(s => s.id));
+  return PAIRS.filter(([a, b]) => {
+    if (ids.has(a) && ids.has(b)) return true;
+    const slug = pairSlug(a, b);
+    if (!warned.has(slug)) {
+      warned.add(slug);
+      const missing = [a, b].filter(id => !ids.has(id)).join(' and ');
+      console.warn(`Comparison ${slug} dropped: no shoe with id ${missing}`);
+    }
+    return false;
+  }).map(([a, b]) => pairSlug(a, b));
+}
 
 const CAT = {
   daily_trainer: 'everyday trainer', max_cushion: 'max cushioned shoe',

@@ -1,12 +1,14 @@
 import { notFound } from 'next/navigation';
 import { getShoes } from '../../../lib/shoes';
-import { PAIRS, ALL_PAIR_SLUGS, pairSlug, pairFromSlug, comparison, verdict } from '../../../lib/compare';
+import { PAIRS, livePairSlugs, pairSlug, pairFromSlug, comparison, verdict } from '../../../lib/compare';
 import { ratingStats, shoeFinderScore, DEFAULT_QUESTION_COUNT } from '../../../lib/match.js';
 
 export const revalidate = 300;
 
-export function generateStaticParams() {
-  return ALL_PAIR_SLUGS.map(pair => ({ pair }));
+// Same list as the sitemap, so the two cannot disagree about which pairs exist.
+export async function generateStaticParams() {
+  const { shoes } = await getShoes();
+  return livePairSlugs(shoes).map(pair => ({ pair }));
 }
 
 const nm = s => `${s.brand} ${s.model}`;
