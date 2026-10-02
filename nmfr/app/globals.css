@@ -105,7 +105,7 @@ h1, h2, h3 { font-family: var(--display); text-wrap: balance; }
 .demo-head { display: flex; align-items: baseline; justify-content: space-between; gap: 12px; flex-wrap: wrap; }
 .demo-card h3 { font-size: 26px; letter-spacing: -0.02em; margin: 0; font-weight: 800; line-height: 1.05; }
 .demo-card .price { font-weight: 600; font-size: 17px; }
-.demo-card .price s, .deal-tile .price s { color: var(--faint); font-weight: 400; font-size: 14px; margin-left: 6px; }
+.demo-card .price s { color: var(--faint); font-weight: 400; font-size: 14px; margin-left: 6px; }
 .demo-card .why, .demo-card .specs { margin: 0; }
 .demo-fade { margin: 12px 4px 0; font-size: 13.5px; color: var(--faint); max-width: 44ch; }
 
@@ -133,29 +133,22 @@ h1, h2, h3 { font-family: var(--display); text-wrap: balance; }
 
 .section-head { display: grid; gap: 10px; margin-bottom: 26px; }
 .section-head p { margin: 0; }
-.eyebrow { font: 600 12px/1 var(--mono); color: var(--accent); letter-spacing: 0.08em; text-transform: uppercase; }
-.bento { display: grid; gap: 12px; }
-.deal-tile {
+/* Sizes laid out like a shop's size run: a chip per size, the count under it.
+   Wraps on a phone rather than scrolling sideways, so every size is visible. */
+.size-row + .size-row { margin-top: 26px; }
+.size-row h3 { font-family: var(--font-body), system-ui, sans-serif; font-size: 15px; font-weight: 600; color: var(--muted); margin: 0 0 10px; }
+.size-chips { display: grid; grid-template-columns: repeat(auto-fill, minmax(92px, 1fr)); gap: 8px; }
+.size-chip {
+  display: grid; gap: 3px; padding: 12px 14px; text-decoration: none;
   background: var(--card); border: 1px solid var(--line); border-radius: var(--radius);
-  padding: 10px; display: grid; grid-template-columns: 104px minmax(0, 1fr); gap: 14px; align-items: center;
-  text-decoration: none; transition: border-color .15s ease, transform .25s cubic-bezier(.16,1,.3,1);
+  transition: border-color .15s ease, background .15s ease, transform .2s cubic-bezier(.16,1,.3,1);
 }
-.deal-tile:hover { border-color: var(--line-hover); transform: translateY(-2px); }
-.deal-tile .plate img { aspect-ratio: 1; object-fit: cover; }
-.deal-info { display: grid; gap: 6px; }
-.deal-tile .off { font: 600 13px/1 var(--mono); color: var(--accent); }
-.deal-tile h3 { font-size: 18px; letter-spacing: -0.015em; line-height: 1.15; margin: 2px 0 0; font-weight: 750; }
-.deal-tile .price { font-weight: 600; font-size: 15.5px; }
-.deal-tile .liner { color: var(--muted); font-size: 15px; margin: 0; max-width: 46ch; }
-.deal-tile.lead { grid-template-columns: 1fr; padding: 12px; align-content: start; }
-.deal-tile.lead .plate img { aspect-ratio: 4 / 3; object-position: center 55%; }
-.deal-tile.lead .deal-info { padding: 4px 6px 6px; gap: 10px; }
-.deal-tile.lead h3 { font-size: 26px; }
-.deal-tile.lead .price { font-size: 19px; }
-.more { margin-top: 22px; display: flex; flex-wrap: wrap; gap: 14px 20px; align-items: center; }
+.size-chip b { font-family: var(--mono); font-size: 16px; font-weight: 600; font-variant-numeric: tabular-nums; }
+.size-chip span { font-size: 13px; color: var(--muted); }
+.size-chip:hover { border-color: var(--accent); background: var(--accent-wash); }
+.size-chip:active { transform: scale(.98); }
+.more { margin-top: 26px; display: flex; flex-wrap: wrap; gap: 14px 20px; align-items: center; }
 .more .btn { width: auto; }
-.more .quiet { color: var(--muted); font-size: 14px; text-underline-offset: 3px; }
-.more .quiet:hover { color: var(--ink); }
 
 .home-guides > p { margin: 12px 0 24px; }
 .rail {
@@ -287,7 +280,7 @@ input.text:focus { outline: none; border-color: var(--accent); }
   padding: 6px 11px;
   border-radius: 999px;
 }
-.card .brand, .demo-card .brand, .deal-tile .brand { color: var(--muted); font-size: 13px; }
+.card .brand, .demo-card .brand { color: var(--muted); font-size: 13px; }
 .card h3 { font-size: 25px; letter-spacing: -0.02em; margin: 3px 0 8px; font-weight: 800; line-height: 1.1; }
 .price { font-family: var(--mono); font-variant-numeric: tabular-nums; }
 .card .price { font-weight: 600; font-size: 17px; margin-bottom: 12px; }
@@ -453,10 +446,7 @@ input.text:focus { outline: none; border-color: var(--accent); }
   .home-quiz-copy p { font-size: 17px; }
   .panel { padding: 30px; }
   .home-deals, .home-guides { padding: 88px 0; }
-  .bento { grid-template-columns: 1.25fr 1fr; grid-template-rows: repeat(3, auto); gap: 14px; }
-  .deal-tile { grid-template-columns: 132px minmax(0, 1fr); }
-  .deal-tile.lead { grid-row: 1 / span 3; grid-template-columns: 1fr; }
-  .deal-tile.lead h3 { font-size: 30px; }
+  .size-chips { grid-template-columns: repeat(auto-fill, minmax(104px, 1fr)); }
 
   /* --- Questions -------------------------------------------------------- */
   .q { max-width: 760px; margin: 0 auto; padding-top: 10px; }

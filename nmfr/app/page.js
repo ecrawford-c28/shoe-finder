@@ -1,7 +1,7 @@
 import { getShoes } from '../lib/shoes';
 import { scoreShoes } from '../lib/match';
 import { priceOf } from '../lib/feed';
-import { dealCounts, dealsForSize, dealSlug } from '../lib/deals';
+import { dealCounts, dealsForSize, GENDERS, SCALES } from '../lib/deals';
 import { GUIDES } from '../lib/guides';
 import Quiz from '../components/Quiz';
 
@@ -24,9 +24,10 @@ const SAMPLE_ANSWERS = {
   avoid: [],
 };
 
-// How many deals the home page shows. One large and three small fills the grid
-// exactly; any other number leaves a hole in it.
-const HOME_DEALS = 4;
+// A size chip only appears with at least this many deals behind it, the same
+// bar the deals index uses for its headline, so nobody is sent to a page with
+// two shoes on it. The rest are one click away on /deals.
+const MIN_DEALS_FOR_CHIP = 5;
 
 // "Best running shoes for wide feet" becomes "Wide feet". The full heading is
 // right on the guide itself, but twenty of them in a row on the home page is a
@@ -62,41 +63,28 @@ export default async function Home() {
       }
     : null;
 
-  // Deals teaser: the size with the most deals today, so the grid is always
-  // full and the link lands on a page worth reading. Named on the page, so
-  // nobody mistakes it for their own size.
+  // Deals by size. Each chip goes to that size's own page, because a deal is
+  // only a deal if it comes in your size, and showing one size's deals to
+  // everyone sent most people to a page of shoes they could not buy.
   const counts = dealCounts(shoes);
-  let busiest = null;
-  for (const gender of ['men', 'women']) {
-    for (const row of counts[gender]) {
-      if (!busiest || row.count > busiest.count) busiest = { gender, ...row };
+  const chips = gender =>
+    counts[gender]
+      .filter(r => r.count >= MIN_DEALS_FOR_CHIP)
+      .map(r => ({ size: r.size, slug: r.slug, count: r.count }));
+
+  // The headline number counts each shoe once however many sizes it is
+  // discounted in, keyed on brand and model like the deals pages' own dedupe.
+  const discounted = new Set();
+  for (const gender of GENDERS) {
+    for (const size of SCALES[gender]) {
+      for (const g of dealsForSize(shoes, gender, size).groups) {
+        for (const d of g.deals) discounted.add(`${d.shoe.brand} ${d.shoe.model}`.toLowerCase());
+      }
     }
   }
-  let deals = null;
-  if (busiest && busiest.count >= HOME_DEALS) {
-    const { groups, count } = dealsForSize(shoes, busiest.gender, busiest.size);
-    const top = groups
-      .flatMap(g => g.deals)
-      .sort((a, b) => b.percentOff - a.percentOff || a.now - b.now)
-      .slice(0, HOME_DEALS)
-      .map(d => ({
-        id: d.shoe.id,
-        brand: d.shoe.brand,
-        model: d.shoe.model,
-        image: d.shoe.image_url || null,
-        liner: d.shoe.one_liner || '',
-        now: d.now,
-        was: d.was,
-        percentOff: d.percentOff,
-      }));
-    const who = busiest.gender === 'women' ? 'women’s' : 'men’s';
-    deals = {
-      label: `${who} UK ${busiest.size}`,
-      href: `/deals/${dealSlug(busiest.gender, busiest.size)}`,
-      count,
-      top,
-    };
-  }
+  const deals = discounted.size
+    ? { total: discounted.size, men: chips('men'), women: chips('women') }
+    : null;
 
   const guides = GUIDES.map(g => ({ slug: g.slug, label: guideLabel(g.h1) }));
 

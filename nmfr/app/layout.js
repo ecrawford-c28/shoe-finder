@@ -1,13 +1,37 @@
 import './globals.css';
 import { Analytics } from '@vercel/analytics/next';
 import Script from 'next/script';
-import { Archivo, Geist, Geist_Mono } from 'next/font/google';
+import localFont from 'next/font/local';
 
-// Self hosted by next/font, so no request to Google from the visitor's browser.
-// Archivo carries the width axis because the wordmark is set extra wide.
-const display = Archivo({ subsets: ['latin'], axes: ['wdth'], variable: '--font-display', display: 'swap' });
-const body = Geist({ subsets: ['latin'], variable: '--font-body', display: 'swap' });
-const mono = Geist_Mono({ subsets: ['latin'], variable: '--font-mono', display: 'swap' });
+// The font files live in the repo (app/fonts, with their OFL licences) rather
+// than coming from Google Fonts through next/font, which fetches at build time.
+// That made every deploy, the nightly feed refresh included, depend on Google
+// answering. These are the latin variable builds, the same subset as before.
+//
+// Archivo keeps its width axis because the wordmark is set extra wide, so the
+// face declares the stretch range it covers.
+const display = localFont({
+  src: './fonts/Archivo-Variable.woff2',
+  weight: '100 900',
+  style: 'normal',
+  declarations: [{ prop: 'font-stretch', value: '62% 125%' }],
+  variable: '--font-display',
+  display: 'swap',
+});
+const body = localFont({
+  src: './fonts/Geist-Variable.woff2',
+  weight: '100 900',
+  style: 'normal',
+  variable: '--font-body',
+  display: 'swap',
+});
+const mono = localFont({
+  src: './fonts/GeistMono-Variable.woff2',
+  weight: '100 900',
+  style: 'normal',
+  variable: '--font-mono',
+  display: 'swap',
+});
 
 export const metadata = {
   metadataBase: new URL('https://shoefinder.co.uk'),

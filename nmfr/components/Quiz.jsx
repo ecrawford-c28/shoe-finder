@@ -116,41 +116,33 @@ function Intro({ onStart, onAnswerFirst, count, questions, sample, deals, guides
       {deals ? (
         <section className="home-deals" id="deals">
           <div className="section-head">
-            <span className="eyebrow">{deals.label}</span>
-            <h2>Today&rsquo;s biggest savings</h2>
+            <h2>Today&rsquo;s deals, by size</h2>
             <p>
-              {deals.count} shoes discounted and in stock in {deals.label}, the size with the most
-              deals today. Anything under 15% off is left out.
+              {deals.total} shoes are discounted today across all sizes. Pick yours to see the ones
+              in stock in it. Anything under 15% off is left out.
             </p>
           </div>
-          <div className="bento">
-            {deals.top.map((d, i) => (
-              <a key={d.id} className={i === 0 ? 'deal-tile lead' : 'deal-tile'} href={deals.href}>
-                {d.image ? (
-                  <div className="plate">
-                    <img src={d.image} alt={`${d.brand} ${d.model}`} width="600" height="600" loading="lazy" />
-                  </div>
-                ) : null}
-                <div className="deal-info">
-                  <span className="off">{d.percentOff}% off</span>
-                  <div>
-                    <div className="brand">{d.brand}</div>
-                    <h3>{d.model}</h3>
-                  </div>
-                  <div className="price">
-                    £{money(d.now)} <s>£{money(d.was)}</s>
-                  </div>
-                  {i === 0 && d.liner ? <p className="liner">{d.liner}</p> : null}
+          {[
+            ['Men’s', deals.men],
+            ['Women’s', deals.women],
+          ].map(([who, list]) =>
+            list.length ? (
+              <div className="size-row" key={who}>
+                <h3>{who}</h3>
+                <div className="size-chips">
+                  {list.map(c => (
+                    <a key={c.slug} className="size-chip" href={`/deals/${c.slug}`}>
+                      <b>UK {c.size}</b>
+                      <span>{c.count} deals</span>
+                    </a>
+                  ))}
                 </div>
-              </a>
-            ))}
-          </div>
+              </div>
+            ) : null
+          )}
           <div className="more">
             <a className="btn ghost" href="/deals">
-              Choose your size
-            </a>
-            <a className="quiet" href={deals.href}>
-              All {deals.count} in {deals.label}
+              Every size
             </a>
           </div>
         </section>
