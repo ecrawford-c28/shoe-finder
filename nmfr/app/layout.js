@@ -1,6 +1,13 @@
 import './globals.css';
 import { Analytics } from '@vercel/analytics/next';
 import Script from 'next/script';
+import { Archivo, Geist, Geist_Mono } from 'next/font/google';
+
+// Self hosted by next/font, so no request to Google from the visitor's browser.
+// Archivo carries the width axis because the wordmark is set extra wide.
+const display = Archivo({ subsets: ['latin'], axes: ['wdth'], variable: '--font-display', display: 'swap' });
+const body = Geist({ subsets: ['latin'], variable: '--font-body', display: 'swap' });
+const mono = Geist_Mono({ subsets: ['latin'], variable: '--font-mono', display: 'swap' });
 
 export const metadata = {
   metadataBase: new URL('https://shoefinder.co.uk'),
@@ -50,7 +57,7 @@ const jsonLd = {
 
 export default function RootLayout({ children }) {
   return (
-    <html lang="en-GB">
+    <html lang="en-GB" className={`${display.variable} ${body.variable} ${mono.variable}`}>
       <body>
         <script
           type="application/ld+json"
@@ -58,7 +65,7 @@ export default function RootLayout({ children }) {
         />
         <div className="wrap">
           <header className="masthead">
-            <a href="/" style={{ textDecoration: 'none' }}>
+            <a href="/" className="home-link">
               <div className="logo">
                 Shoe <span>Finder</span>
               </div>

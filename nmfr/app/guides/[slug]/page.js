@@ -98,7 +98,9 @@ export default async function Guide({ params }) {
         {picks.map(({ shoe, reasons }) => (
           <li key={shoe.id}>
             {shoe.image_url ? (
-              <img className="g-img" src={shoe.image_url} alt={`${shoe.brand} ${shoe.model}`} loading="lazy" />
+              <div className="g-img">
+                <img src={shoe.image_url} alt={`${shoe.brand} ${shoe.model}`} loading="lazy" />
+              </div>
             ) : null}
             <h3>
               {shoe.brand} {shoe.model}

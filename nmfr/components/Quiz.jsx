@@ -18,56 +18,158 @@ const CAT_LABEL = {
   trail: 'Trail',
 };
 
-function Intro({ onStart, count, questions, sample }) {
+function Intro({ onStart, onAnswerFirst, count, questions, sample, deals, guides }) {
+  const first = QUESTIONS[0];
   return (
-    <section className="hero">
-      <div className="hero-copy">
-      <h1>
-        Which running shoes
-        <br />
-        <em>should you buy?</em>
-      </h1>
-      <p>
-        {questions} quick questions about your feet, your weight and the way you actually run. You get
-        three shoes that suit you, and the reasons why, in plain English.
-      </p>
-      <p>Takes about a minute. No email, no sign up.</p>
-      <div style={{ marginTop: 26 }}>
-        <button className="btn" onClick={onStart}>
-          Start the quiz
-        </button>
-      </div>
-      <p className="meta">
-        {count} shoes in the database, checked and updated weekly.
-      </p>
-      <p className="meta" style={{ marginTop: 4 }}>
-        Or read the <a href="/guides">shoe guides</a>, covering wide feet, overpronation, knee and
-        achilles pain, cushioning, trail and price.
-      </p>
-      </div>
-      {sample ? (
-        <aside className="hero-demo">
-          <p className="demo-label">An example result</p>
-          <div className="demo-card">
-            <span className="rank">Best match</span>
-            <div className="brand">{sample.brand}</div>
-            <h3>{sample.model}</h3>
-            <div className="price">
-              £{sample.rrp} <span>RRP</span>
-            </div>
-            <ul>
-              {sample.reasons.map((r, i) => (
-                <li key={i}>{r}</li>
-              ))}
-            </ul>
-          </div>
-          <p className="demo-fade">
-            That is a real result for someone after comfortable road miles who gets achilles
-            trouble. Yours will be shaped by your own answers.
+    <>
+      <section className="hero">
+        <div className="hero-copy">
+          <h1>
+            Which running shoes <em>should you buy?</em>
+          </h1>
+          <p className="lede">
+            {questions} quick questions about your feet, your weight and how you run. Three shoes
+            that suit you, and why.
           </p>
-        </aside>
+          <div className="ctas">
+            <button className="btn" onClick={onStart}>
+              Take the quiz <span className="arrow" aria-hidden="true">&rarr;</span>
+            </button>
+            <a className="btn ghost" href={deals ? '#deals' : '/deals'}>
+              Today&rsquo;s deals
+            </a>
+          </div>
+        </div>
+        {sample ? (
+          <figure className="hero-demo">
+            <article className="demo-card" aria-label="An example result">
+              <span className="rank">Best match</span>
+              {sample.image ? (
+                <div className="plate">
+                  <img src={sample.image} alt={`${sample.brand} ${sample.model}`} width="600" height="400" />
+                </div>
+              ) : null}
+              <div className="demo-body">
+                <div className="brand">{sample.brand}</div>
+                <div className="demo-head">
+                  <h3>{sample.model}</h3>
+                  <div className="price">
+                    £{money(sample.now)}
+                    {sample.was ? <s>£{money(sample.was)}</s> : null}
+                  </div>
+                </div>
+                <ul className="why">
+                  {sample.reasons.map((r, i) => (
+                    <li key={i}>{r}</li>
+                  ))}
+                </ul>
+                <div className="specs">
+                  <span>{CAT_LABEL[sample.category] || sample.category}</span>
+                  <span>{sample.weight}g</span>
+                  <span>{sample.drop}mm drop</span>
+                </div>
+              </div>
+            </article>
+            <figcaption className="demo-fade">
+              A real result for someone after comfortable road miles who gets achilles trouble.
+              Yours depends on your answers.
+            </figcaption>
+          </figure>
+        ) : null}
+      </section>
+
+      <div className="facts">
+        <span>
+          <b>{count}</b> shoes in the database, prices checked daily
+        </span>
+        <span>About a minute to finish</span>
+        <span>No email, no sign up</span>
+      </div>
+
+      <section className="home-quiz">
+        <div className="home-quiz-copy">
+          <h2>Your answers pick the shoes</h2>
+          <p>
+            Every shoe is scored against what you tell us about fit, weight, pronation and the
+            running you do. Commission plays no part in the order.
+          </p>
+        </div>
+        <div className="panel">
+          <p className="panel-step">
+            1 of {questions}
+          </p>
+          <h3>{first.title}</h3>
+          {first.help ? <p className="help">{first.help}</p> : null}
+          {/* The real first question. Picking an answer starts the quiz with it
+              already given, so the home page is the first step, not a lobby. */}
+          <div className="opts">
+            {first.options.map(o => (
+              <button key={o.value} className="opt" onClick={() => onAnswerFirst(o.value)}>
+                <strong>{o.label}</strong>
+                {o.sub ? <small>{o.sub}</small> : null}
+              </button>
+            ))}
+          </div>
+        </div>
+      </section>
+
+      {deals ? (
+        <section className="home-deals" id="deals">
+          <div className="section-head">
+            <span className="eyebrow">{deals.label}</span>
+            <h2>Today&rsquo;s biggest savings</h2>
+            <p>
+              {deals.count} shoes discounted and in stock in {deals.label}, the size with the most
+              deals today. Anything under 15% off is left out.
+            </p>
+          </div>
+          <div className="bento">
+            {deals.top.map((d, i) => (
+              <a key={d.id} className={i === 0 ? 'deal-tile lead' : 'deal-tile'} href={deals.href}>
+                {d.image ? (
+                  <div className="plate">
+                    <img src={d.image} alt={`${d.brand} ${d.model}`} width="600" height="600" loading="lazy" />
+                  </div>
+                ) : null}
+                <div className="deal-info">
+                  <span className="off">{d.percentOff}% off</span>
+                  <div>
+                    <div className="brand">{d.brand}</div>
+                    <h3>{d.model}</h3>
+                  </div>
+                  <div className="price">
+                    £{money(d.now)} <s>£{money(d.was)}</s>
+                  </div>
+                  {i === 0 && d.liner ? <p className="liner">{d.liner}</p> : null}
+                </div>
+              </a>
+            ))}
+          </div>
+          <div className="more">
+            <a className="btn ghost" href="/deals">
+              Choose your size
+            </a>
+            <a className="quiet" href={deals.href}>
+              All {deals.count} in {deals.label}
+            </a>
+          </div>
+        </section>
       ) : null}
-    </section>
+
+      {guides && guides.length ? (
+        <section className="home-guides">
+          <h2>Shoe guides, in plain English</h2>
+          <p>Already know what you need? Each guide picks shoes for one kind of runner and says why.</p>
+          <div className="rail">
+            {guides.map(g => (
+              <a key={g.slug} href={`/guides/${g.slug}`}>
+                {g.label}
+              </a>
+            ))}
+          </div>
+        </section>
+      ) : null}
+    </>
   );
 }
 
@@ -207,13 +309,14 @@ function ShoeCard({ entry, rank, size, clearWinner, gender }) {
       {rank === 0 && <span className="rank">{clearWinner ? 'Best match' : 'Top pick'}</span>}
       {entry.valuePick && <span className="rank value">Best value</span>}
       {imgOk ? (
-        <img
-          className="shoe-img"
-          src={s.image_url}
-          alt={`${s.brand} ${s.model}`}
-          loading="lazy"
-          onError={() => setImgOk(false)}
-        />
+        <div className="shoe-img">
+          <img
+            src={s.image_url}
+            alt={`${s.brand} ${s.model}`}
+            loading="lazy"
+            onError={() => setImgOk(false)}
+          />
+        </div>
       ) : null}
       <div className="card-body">
       {/* Shown only when the size filter could not fill the page from stock in
@@ -438,7 +541,7 @@ function Results({ answers, shoes, onRestart }) {
   );
 }
 
-export default function Quiz({ shoes, brands, sample }) {
+export default function Quiz({ shoes, brands, sample, deals, guides }) {
   const [stage, setStage] = useState('intro');
   const [step, setStep] = useState(0);
   const [answers, setAnswers] = useState({});
@@ -479,6 +582,16 @@ export default function Quiz({ shoes, brands, sample }) {
     setStage('quiz');
   };
 
+  // Answering the first question on the home page counts as starting and as
+  // answering it, so the funnel reads the same however someone got in.
+  const answerFirst = value => {
+    track('quiz_started');
+    track('question_answered', { question: QUESTIONS[0].id, step: 1, of: total });
+    setAnswers({ [QUESTIONS[0].id]: value });
+    setStep(1);
+    setStage('quiz');
+  };
+
   const next = () => {
     track('question_answered', { question: q.id, step: safeStep + 1, of: total });
     if (safeStep + 1 >= total) {
@@ -498,7 +611,15 @@ export default function Quiz({ shoes, brands, sample }) {
   return (
     <main ref={topRef}>
       {stage === 'intro' && (
-        <Intro count={shoes.length} questions={total} onStart={start} sample={sample} />
+        <Intro
+          count={shoes.length}
+          questions={total}
+          onStart={start}
+          onAnswerFirst={answerFirst}
+          sample={sample}
+          deals={deals}
+          guides={guides}
+        />
       )}
       {stage === 'quiz' && (
         <Question
