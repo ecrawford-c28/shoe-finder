@@ -10,11 +10,11 @@
 // A shoe absent from here is absent from the retailer's catalogue, which
 // the site treats as unbuyable. See lib/feed.js.
 //
-// Generated: 2026-10-02T08:12:11Z
+// Generated: 2026-10-02T10:27:45Z
 // Matched: 221 of 227 shoes in the database.
 
 const feed = {
- "generated": "2026-10-02T08:12:11Z",
+ "generated": "2026-10-02T10:27:45Z",
  "matched": 221,
  "requested": 227,
  "shoes": {

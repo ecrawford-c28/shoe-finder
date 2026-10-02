@@ -13,11 +13,11 @@
 // is not always priced like the men's one, and the GORE-TEX versions
 // never are.
 //
-// Generated: 2026-10-02T08:12:11Z
+// Generated: 2026-10-02T10:27:45Z
 // Men's listings: 221. Women's listings: 199.
 
 const sizes = {
- "generated": "2026-10-02T08:12:11Z",
+ "generated": "2026-10-02T10:27:45Z",
  "mens": {
   "act13": {
    "in": [
