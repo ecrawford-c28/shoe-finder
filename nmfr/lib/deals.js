@@ -132,23 +132,37 @@ export function dealsForSize(shoes, gender, size) {
     });
   }
 
+  // The retailer lists some shoes twice, a new season colourway beside the
+  // outgoing one, so they arrive as two rows under the same name. Keep the
+  // better deal of the pair. The key is the name rather than the family on
+  // purpose, because Clifton 10 and Clifton 11 share a family and belong on
+  // the page together.
+  found.sort((a, b) => b.percentOff - a.percentOff || a.now - b.now);
+  const seen = new Set();
+  const unique = found.filter(d => {
+    const key = `${d.shoe.brand} ${d.shoe.model}`.toLowerCase();
+    if (seen.has(key)) return false;
+    seen.add(key);
+    return true;
+  });
+
   const groups = CATEGORY_ORDER
     .map(category => ({
       category,
       label: CATEGORY_LABEL[category] || category,
-      deals: found
+      deals: unique
         .filter(d => d.shoe.category === category)
         .sort((a, b) => b.percentOff - a.percentOff || a.now - b.now),
     }))
     .filter(g => g.deals.length);
 
-  const best = found.slice().sort((a, b) => b.percentOff - a.percentOff)[0] || null;
+  const best = unique.slice().sort((a, b) => b.percentOff - a.percentOff)[0] || null;
   return {
     groups,
-    count: found.length,
+    count: unique.length,
     best,
     deepest: best ? best.percentOff : 0,
-    cheapest: found.length ? Math.min(...found.map(d => d.now)) : null,
+    cheapest: unique.length ? Math.min(...unique.map(d => d.now)) : null,
   };
 }
 
