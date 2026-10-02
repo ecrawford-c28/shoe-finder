@@ -1,4 +1,5 @@
 import { ImageResponse } from 'next/og';
+import { DEFAULT_QUESTION_COUNT } from '../lib/match';
 
 export const size = { width: 1200, height: 630 };
 export const contentType = 'image/png';
@@ -52,7 +53,7 @@ export default function OgImage() {
         </div>
 
         <div style={{ display: 'flex', fontSize: 28, color: '#9a9aa6' }}>
-          11 questions. 3 shoes that actually suit you. shoefinder.co.uk
+          {`${DEFAULT_QUESTION_COUNT} questions. 3 shoes that actually suit you. shoefinder.co.uk`}
         </div>
       </div>
     ),

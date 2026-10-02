@@ -1,6 +1,6 @@
 import { notFound } from 'next/navigation';
 import { getShoes } from '../../../lib/shoes';
-import { scoreShoes } from '../../../lib/match';
+import { scoreShoes, DEFAULT_QUESTION_COUNT } from '../../../lib/match';
 import { GUIDES, guideBySlug } from '../../../lib/guides';
 
 export const revalidate = 300;
@@ -98,7 +98,9 @@ export default async function Guide({ params }) {
         {picks.map(({ shoe, reasons }) => (
           <li key={shoe.id}>
             {shoe.image_url ? (
-              <img className="g-img" src={shoe.image_url} alt={`${shoe.brand} ${shoe.model}`} loading="lazy" />
+              <div className="g-img">
+                <img src={shoe.image_url} alt={`${shoe.brand} ${shoe.model}`} loading="lazy" />
+              </div>
             ) : null}
             <h3>
               {shoe.brand} {shoe.model}
@@ -184,7 +186,7 @@ export default async function Guide({ params }) {
         </div>
         <div className="side-box">
           <h4>Get your own list</h4>
-          <p>Thirteen questions, three shoes, and the reason for each one.</p>
+          <p>{DEFAULT_QUESTION_COUNT} questions, three shoes, and the reason for each one.</p>
           <a className="btn" href="/">
             Start the quiz
           </a>

@@ -157,6 +157,13 @@ export function visibleQuestions(answers) {
   return QUESTIONS.filter(q => !q.showIf || q.showIf(answers || {}));
 }
 
+// How many questions someone sees before answering anything, which is the
+// number the copy quotes. Some answers add a question (the plate question), so
+// this is the count a newcomer is promised, not the most they can be asked.
+// Derived rather than typed, so adding a question cannot leave a page saying
+// the old number, which is how "eleven" outlived two new questions.
+export const DEFAULT_QUESTION_COUNT = visibleQuestions({}).length;
+
 const CUSH_ORDER = ['firm', 'balanced', 'plush'];
 
 // What to tell the shopper about a discount code on this row. Lives here rather

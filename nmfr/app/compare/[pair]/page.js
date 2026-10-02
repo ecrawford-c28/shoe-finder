@@ -1,7 +1,7 @@
 import { notFound } from 'next/navigation';
 import { getShoes } from '../../../lib/shoes';
 import { PAIRS, ALL_PAIR_SLUGS, pairSlug, pairFromSlug, comparison, verdict } from '../../../lib/compare';
-import { ratingStats, shoeFinderScore } from '../../../lib/match.js';
+import { ratingStats, shoeFinderScore, DEFAULT_QUESTION_COUNT } from '../../../lib/match.js';
 
 export const revalidate = 300;
 
@@ -187,7 +187,7 @@ export default async function Compare({ params }) {
         </div>
         <div className="side-box">
           <h4>Not sure either is right?</h4>
-          <p>Thirteen questions, three shoes, and the reason for each one.</p>
+          <p>{DEFAULT_QUESTION_COUNT} questions, three shoes, and the reason for each one.</p>
           <a className="btn" href="/">
             Start the quiz
           </a>

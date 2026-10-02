@@ -1,13 +1,29 @@
 :root {
-  --bg: #0b0b0d;
-  --bg-2: #141418;
-  --card: #17171c;
-  --line: #26262e;
-  --ink: #f4f4f2;
-  --muted: #9a9aa6;
+  color-scheme: dark;
+  /* Neutrals lean very slightly green, toward the accent, instead of the cold
+     blue grey they had, so the lime sits in the palette rather than on it. */
+  --bg: #0e0f0b;
+  --bg-2: #14160f;
+  --card: #171912;
+  --card-2: #1d2016;
+  --line: #2b2e24;
+  --line-hover: #474b3c;
+  --ink: #f1f3ea;
+  --muted: #a3a796;
+  --faint: #7c8070;
   --accent: #ccff33;
-  --accent-ink: #0b0b0d;
-  --radius: 16px;
+  --accent-hover: #d9ff66;
+  --accent-ink: #11140a;
+  --accent-wash: #1f2810;
+  --warn: #ffcf70;
+  /* Product shots come on white. Sitting them on a pale plate, multiplied, makes
+     the white disappear into it instead of glaring out of a dark page. */
+  --plate: #e8eae0;
+  /* One shape rule: surfaces 14px, photo plates 10px, controls a full pill. */
+  --radius: 14px;
+  --radius-plate: 10px;
+  --display: var(--font-display), "Arial Narrow", system-ui, sans-serif;
+  --mono: var(--font-mono), ui-monospace, "SFMono-Regular", Consolas, monospace;
 }
 
 * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
@@ -17,13 +33,16 @@ html, body {
   padding: 0;
   background: var(--bg);
   color: var(--ink);
-  font-family: ui-sans-serif, system-ui, -apple-system, "Segoe UI", Inter, Roboto, "Helvetica Neue", Arial, sans-serif;
+  font-family: var(--font-body), ui-sans-serif, system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
   -webkit-font-smoothing: antialiased;
   font-size: 17px;
   line-height: 1.5;
 }
 
 a { color: inherit; }
+h1, h2, h3 { font-family: var(--display); text-wrap: balance; }
+:focus-visible { outline: 2px solid var(--accent); outline-offset: 3px; }
+.home-link { text-decoration: none; }
 
 .wrap { max-width: 640px; margin: 0 auto; padding: 0 20px; }
 
@@ -36,8 +55,10 @@ a { color: inherit; }
   gap: 12px;
 }
 .logo {
-  font-weight: 800;
-  letter-spacing: -0.03em;
+  font-family: var(--display);
+  font-stretch: 125%;
+  font-weight: 900;
+  letter-spacing: -0.01em;
   font-size: 17px;
   line-height: 1.05;
   text-transform: uppercase;
@@ -54,18 +75,96 @@ a { color: inherit; }
   white-space: nowrap;
 }
 
-/* ---------- intro ---------- */
-.hero { padding: 18px 0 30px; }
+/* ---------- home ---------- */
+/* Phone first. The desktop block further down only rearranges these. */
+.hero { padding: 22px 0 34px; display: grid; gap: 36px; }
 .hero h1 {
-  font-size: clamp(38px, 11vw, 62px);
-  line-height: 0.94;
-  letter-spacing: -0.045em;
-  margin: 0 0 18px;
-  font-weight: 800;
+  font-size: clamp(40px, 11vw, 58px);
+  line-height: 1;
+  letter-spacing: -0.035em;
+  margin: 0;
+  font-weight: 850;
+  text-wrap: wrap;
 }
-.hero h1 em { font-style: normal; color: var(--accent); }
-.hero p { color: var(--muted); font-size: 17px; margin: 0 0 12px; max-width: 30em; }
-.hero .meta { font-size: 13px; color: #6f6f7c; margin-top: 22px; }
+.hero h1 em { font-style: normal; color: var(--accent); display: block; }
+.hero .lede { color: var(--muted); font-size: 17px; margin: 18px 0 26px; max-width: 34ch; }
+.ctas { display: flex; flex-wrap: wrap; gap: 10px; }
+.ctas .btn { width: auto; }
+
+.hero-demo { margin: 0; }
+.demo-card {
+  background: var(--card); border: 1px solid var(--line); border-radius: var(--radius);
+  padding: 12px; position: relative; display: grid; gap: 14px;
+  box-shadow: 0 30px 80px -40px rgb(204 255 51 / .18);
+}
+.demo-card .rank { top: 22px; left: 22px; z-index: 1; }
+.plate { background: var(--plate); border-radius: var(--radius-plate); overflow: hidden; }
+.plate img { display: block; width: 100%; height: auto; mix-blend-mode: multiply; }
+.demo-card .plate img { aspect-ratio: 16 / 10; object-fit: cover; object-position: center 58%; }
+.demo-body { padding: 0 6px 6px; display: grid; gap: 12px; }
+.demo-head { display: flex; align-items: baseline; justify-content: space-between; gap: 12px; flex-wrap: wrap; }
+.demo-card h3 { font-size: 26px; letter-spacing: -0.02em; margin: 0; font-weight: 800; line-height: 1.05; }
+.demo-card .price { font-weight: 600; font-size: 17px; }
+.demo-card .price s { color: var(--faint); font-weight: 400; font-size: 14px; margin-left: 6px; }
+.demo-card .why, .demo-card .specs { margin: 0; }
+.demo-fade { margin: 12px 4px 0; font-size: 13.5px; color: var(--faint); max-width: 44ch; }
+
+.facts {
+  display: flex; flex-wrap: wrap; gap: 8px 36px;
+  padding: 18px 0; border-top: 1px solid var(--line); border-bottom: 1px solid var(--line);
+  color: var(--muted); font-size: 15px;
+}
+.facts b { color: var(--ink); font-weight: 600; font-family: var(--mono); }
+
+.home-quiz, .home-deals, .home-guides { padding: 56px 0; }
+.home-deals, .home-guides { border-top: 1px solid var(--line); }
+.home-quiz h2, .home-deals h2, .home-guides h2 {
+  font-size: clamp(28px, 7vw, 42px); line-height: 1.04; letter-spacing: -0.03em; margin: 0; font-weight: 800;
+}
+.home-quiz-copy p, .home-guides > p, .section-head p { color: var(--muted); max-width: 52ch; }
+.home-quiz-copy p { margin: 16px 0 26px; }
+.panel { background: var(--card); border: 1px solid var(--line); border-radius: var(--radius); padding: 22px; }
+.panel-step { font: 500 13px/1 var(--mono); color: var(--muted); margin: 0 0 14px; }
+.panel h3 { font-size: 24px; letter-spacing: -0.02em; line-height: 1.12; margin: 0; font-weight: 800; }
+.panel .help { color: var(--muted); font-size: 15px; margin: 8px 0 18px; }
+.panel .opt { padding: 14px 16px; background: var(--card-2); }
+.panel .opt strong { font-size: 15.5px; }
+.panel .opt small { font-size: 13.5px; }
+
+.section-head { display: grid; gap: 10px; margin-bottom: 26px; }
+.section-head p { margin: 0; }
+/* Sizes laid out like a shop's size run: a chip per size, the count under it.
+   Wraps on a phone rather than scrolling sideways, so every size is visible. */
+.size-row + .size-row { margin-top: 26px; }
+.size-row h3 { font-family: var(--font-body), system-ui, sans-serif; font-size: 15px; font-weight: 600; color: var(--muted); margin: 0 0 10px; }
+.size-chips { display: grid; grid-template-columns: repeat(auto-fill, minmax(92px, 1fr)); gap: 8px; }
+.size-chip {
+  display: grid; gap: 3px; padding: 12px 14px; text-decoration: none;
+  background: var(--card); border: 1px solid var(--line); border-radius: var(--radius);
+  transition: border-color .15s ease, background .15s ease, transform .2s cubic-bezier(.16,1,.3,1);
+}
+.size-chip b { font-family: var(--mono); font-size: 16px; font-weight: 600; font-variant-numeric: tabular-nums; }
+.size-chip span { font-size: 13px; color: var(--muted); }
+.size-chip:hover { border-color: var(--accent); background: var(--accent-wash); }
+.size-chip:active { transform: scale(.98); }
+.more { margin-top: 26px; display: flex; flex-wrap: wrap; gap: 14px 20px; align-items: center; }
+.more .btn { width: auto; }
+
+.home-guides > p { margin: 12px 0 24px; }
+.rail {
+  display: flex; gap: 8px; overflow-x: auto; scroll-snap-type: x proximity;
+  padding-bottom: 12px; scrollbar-color: var(--line) transparent;
+}
+.rail a {
+  scroll-snap-align: start; flex: none; text-decoration: none;
+  border: 1px solid var(--line); border-radius: 999px; padding: 11px 17px;
+  font-size: 15px; white-space: nowrap; transition: border-color .15s ease, background .15s ease;
+}
+.rail a:hover { border-color: var(--accent); background: var(--accent-wash); }
+
+.notfound { padding: 60px 0 80px; }
+.notfound h1 { font-size: clamp(34px, 8vw, 52px); letter-spacing: -0.03em; line-height: 1.02; margin: 0 0 14px; }
+.notfound p { color: var(--muted); margin: 0 0 26px; }
 
 /* ---------- buttons ---------- */
 .btn {
@@ -84,13 +183,19 @@ a { color: inherit; }
   cursor: pointer;
   text-decoration: none;
   font-family: inherit;
+  white-space: nowrap;
+  transition: transform .25s cubic-bezier(.16,1,.3,1), background .2s ease, border-color .2s ease;
 }
+.btn:hover { background: var(--accent-hover); }
+.btn:active { transform: scale(.98); }
+.btn .arrow { font-family: var(--mono); font-weight: 500; }
 .btn:disabled { opacity: 0.35; cursor: default; }
 .btn.ghost {
   background: transparent;
   color: var(--ink);
   border: 1px solid var(--line);
 }
+.btn.ghost:hover { background: transparent; border-color: var(--muted); }
 .btn.small { width: auto; padding: 11px 18px; font-size: 15px; }
 
 /* ---------- progress ---------- */
@@ -125,8 +230,9 @@ a { color: inherit; }
   font-size: 17px;
   transition: border-color .12s ease, background .12s ease;
 }
-.opt:hover { border-color: #3a3a46; }
-.opt.on { border-color: var(--accent); background: #1c2110; }
+.opt:hover { border-color: var(--line-hover); }
+.opt:active { transform: scale(.985); }
+.opt.on { border-color: var(--accent); background: var(--accent-wash); }
 .opt strong { display: block; font-weight: 650; }
 .opt small { display: block; color: var(--muted); font-size: 14px; margin-top: 3px; }
 .opt.chip { display: inline-block; width: auto; padding: 11px 16px; border-radius: 999px; font-size: 15px; }
@@ -158,7 +264,7 @@ input.text:focus { outline: none; border-color: var(--accent); }
 .card {
   background: var(--card);
   border: 1px solid var(--line);
-  border-radius: 20px;
+  border-radius: var(--radius);
   padding: 20px;
   margin: 14px 0;
   position: relative;
@@ -169,26 +275,36 @@ input.text:focus { outline: none; border-color: var(--accent); }
   top: -11px; left: 20px;
   background: var(--accent);
   color: var(--accent-ink);
-  font-size: 11px;
-  font-weight: 800;
-  letter-spacing: 0.1em;
-  text-transform: uppercase;
-  padding: 4px 11px;
+  font-size: 12px;
+  font-weight: 700;
+  padding: 6px 11px;
   border-radius: 999px;
 }
-.card .brand { color: var(--muted); font-size: 13px; text-transform: uppercase; letter-spacing: 0.1em; }
-.card h3 { font-size: 25px; letter-spacing: -0.025em; margin: 3px 0 8px; font-weight: 750; line-height: 1.1; }
-.card .price { font-weight: 700; font-size: 17px; margin-bottom: 12px; }
+.card .brand, .demo-card .brand { color: var(--muted); font-size: 13px; }
+.card h3 { font-size: 25px; letter-spacing: -0.02em; margin: 3px 0 8px; font-weight: 800; line-height: 1.1; }
+.price { font-family: var(--mono); font-variant-numeric: tabular-nums; }
+.card .price { font-weight: 600; font-size: 17px; margin-bottom: 12px; }
 .card .price s { color: var(--muted); font-weight: 400; }
 .card .price .rrp-note { color: var(--muted); font-weight: 400; font-size: 13px; white-space: nowrap; }
 .card .liner { margin: 0 0 14px; }
-.shoe-img { width: 100%; height: 170px; object-fit: contain; background: #fff; border-radius: 12px; margin-bottom: 14px; }
+.shoe-img {
+  display: block; width: 100%; height: 170px; overflow: hidden;
+  background: var(--plate); border-radius: var(--radius-plate); margin-bottom: 14px;
+}
+/* The blend has to happen inside the pale plate. On the image itself it would
+   multiply against the dark card behind and turn the shoe nearly black. */
+.shoe-img > img, .g-img > img {
+  display: block; width: 100%; height: 100%; object-fit: contain; mix-blend-mode: multiply;
+}
 .why { list-style: none; padding: 0; margin: 0 0 16px; display: grid; gap: 7px; }
-.why li { font-size: 15px; color: #d7d7d3; padding-left: 22px; position: relative; }
-.why li:before { content: '✓'; position: absolute; left: 0; color: var(--accent); font-weight: 700; }
-.warn { font-size: 14px; color: #ffcf70; margin: 0 0 14px; }
+.why li { font-size: 15px; color: #d9dccf; padding-left: 24px; position: relative; }
+.why li:before {
+  content: ""; position: absolute; left: 2px; top: 7px; width: 9px; height: 5px;
+  border-left: 2px solid var(--accent); border-bottom: 2px solid var(--accent); transform: rotate(-45deg);
+}
+.warn { font-size: 14px; color: var(--warn); margin: 0 0 14px; }
 .specs { display: flex; flex-wrap: wrap; gap: 6px; margin: 0 0 16px; }
-.specs span { font-size: 12px; color: var(--muted); border: 1px solid var(--line); padding: 4px 10px; border-radius: 999px; }
+.specs span { font-family: var(--mono); font-size: 12px; color: var(--muted); border: 1px solid var(--line); padding: 5px 10px; border-radius: 999px; }
 
 .disclosure {
   font-size: 13px;
@@ -206,7 +322,7 @@ input.text:focus { outline: none; border-color: var(--accent); }
   padding-top: 22px;
   border-top: 1px solid var(--line);
   font-size: 13px;
-  color: #6f6f7c;
+  color: var(--faint);
   display: flex;
   flex-wrap: wrap;
   gap: 14px;
@@ -291,7 +407,7 @@ input.text:focus { outline: none; border-color: var(--accent); }
    --------------------------------------------------------------------------- */
 
 .mainnav { display: none; }
-.hero-demo, .results-side, .guide-side, .guide-list .g-img { display: none; }
+.results-side, .guide-side, .guide-list .g-img { display: none; }
 
 @media (min-width: 900px) {
   .wrap {
@@ -315,34 +431,22 @@ input.text:focus { outline: none; border-color: var(--accent); }
 
   /* --- Home ------------------------------------------------------------- */
   .hero {
-    display: grid;
-    grid-template-columns: minmax(0, 1fr) 380px;
-    gap: 60px;
+    grid-template-columns: minmax(0, 7fr) minmax(0, 5fr);
+    gap: clamp(40px, 6vw, 88px);
     align-items: center;
-    min-height: calc(100vh - 230px);
-    padding: 10px 0 40px;
+    padding: 48px 0 64px;
   }
-  .hero h1 { font-size: clamp(38px, 3.4vw, 50px); }
-  .hero p { font-size: 18px; }
-  .hero .btn { width: auto; padding: 18px 40px; font-size: 18px; }
-  .hero-demo { display: block; }
-  .demo-label {
-    font-size: 11px; text-transform: uppercase; letter-spacing: .1em;
-    color: var(--muted); margin: 0 0 10px; text-align: center;
+  .hero h1 { font-size: clamp(44px, 4.4vw, 60px); }
+  .hero .lede { font-size: 19px; margin: 24px 0 32px; }
+  .hero .btn { padding: 17px 30px; }
+  .home-quiz {
+    display: grid; grid-template-columns: minmax(0, 5fr) minmax(0, 6fr);
+    gap: clamp(40px, 6vw, 80px); align-items: start; padding: 96px 0;
   }
-  .demo-card {
-    background: var(--card); border: 1px solid var(--line); border-radius: 20px;
-    padding: 20px; position: relative;
-  }
-  .demo-card .rank { position: absolute; top: -11px; left: 20px; }
-  .demo-card .brand { color: var(--muted); font-size: 13px; letter-spacing: .1em; text-transform: uppercase; }
-  .demo-card h3 { font-size: 23px; letter-spacing: -.025em; margin: 3px 0 6px; font-weight: 750; }
-  .demo-card .price { font-weight: 700; font-size: 16px; margin-bottom: 12px; }
-  .demo-card .price span { color: var(--muted); font-weight: 400; font-size: 13px; }
-  .demo-card ul { list-style: none; padding: 0; margin: 0; display: grid; gap: 7px; }
-  .demo-card li { font-size: 14px; color: #d7d7d3; padding-left: 20px; position: relative; }
-  .demo-card li:before { content: '✓'; position: absolute; left: 0; color: var(--accent); font-weight: 700; }
-  .demo-fade { margin: 14px 0 0; font-size: 13px; color: #6f6f7c; }
+  .home-quiz-copy p { font-size: 17px; }
+  .panel { padding: 30px; }
+  .home-deals, .home-guides { padding: 88px 0; }
+  .size-chips { grid-template-columns: repeat(auto-fill, minmax(104px, 1fr)); }
 
   /* --- Questions -------------------------------------------------------- */
   .q { max-width: 760px; margin: 0 auto; padding-top: 10px; }
@@ -414,10 +518,13 @@ input.text:focus { outline: none; border-color: var(--accent); }
   .guide-side .btn { font-size: 15px; padding: 14px 18px; }
 
   /* Shortlist entries get the shoe alongside them. */
-  .guide-list > li:has(.g-img) { display: grid; grid-template-columns: 130px minmax(0, 1fr); gap: 22px; }
+  /* The photo spans the entry instead of sitting in its first row, which used to
+     stretch that row and open a gap under every heading. Row gap goes for the
+     same reason: the text keeps its own margins. */
+  .guide-list > li:has(.g-img) { display: grid; grid-template-columns: 130px minmax(0, 1fr); gap: 0 22px; }
   .guide-list .g-img {
-    display: block; width: 130px; height: 100px; object-fit: contain;
-    background: #fff; border-radius: 10px; margin-top: 6px;
+    display: block; width: 130px; height: 100px; grid-row: 1 / span 8; align-self: start;
+    background: var(--plate); border-radius: var(--radius-plate); margin-top: 6px;
   }
   .guide-list > li:has(.g-img) > :not(.g-img) { grid-column: 2; }
   .guide-list > li h3:before { content: counter(pick) '. '; }
@@ -618,6 +725,7 @@ input.text:focus { outline: none; border-color: var(--accent); }
    thing inside it, so the photo starts a little lower than the quiz's text does
    to keep the two off each other. */
 .deal-img { height: 130px; margin: 8px 0 12px; }
+.guide-list .g-img { background: var(--plate); overflow: hidden; }
 .dealcards .card .liner { margin: 0 0 12px; }
 
 /* ---------- the size picker ---------- */
@@ -646,4 +754,10 @@ input.text:focus { outline: none; border-color: var(--accent); }
 @media (max-width: 420px) {
   .sizepick { grid-template-columns: repeat(auto-fill, minmax(56px, 1fr)); gap: 6px; }
   .sizeopt { padding: 13px 2px; font-size: 15px; }
+}
+
+/* Motion is feedback only: presses, hovers and the odd lift. None of it carries
+   meaning, so all of it goes for anyone who has asked for less. */
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after { animation: none !important; transition: none !important; }
 }

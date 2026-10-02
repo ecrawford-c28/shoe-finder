@@ -26,7 +26,9 @@ function DealCard({ deal, top }) {
       <div className="rank">{deal.percentOff}% off</div>
       <div className="card-body">
         {deal.image ? (
-          <img className="shoe-img deal-img" src={deal.image} alt={`${deal.brand} ${deal.model}`} loading="lazy" />
+          <div className="shoe-img deal-img">
+            <img src={deal.image} alt={`${deal.brand} ${deal.model}`} loading="lazy" />
+          </div>
         ) : null}
         <div className="brand">{deal.brand}</div>
         <h3>{deal.model}</h3>
