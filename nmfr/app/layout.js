@@ -118,6 +118,7 @@ export default function RootLayout({ children }) {
             <a href="/guides">Guides</a>
             <a href="/compare">Comparisons</a>
             <a href="/how-it-works">How it works</a>
+            <a href="/nmfr-choice">NMFR Choice</a>
             <a href="/privacy">Privacy</a>
             <a href="/terms">Terms</a>
             <a href="/contact">Contact</a>

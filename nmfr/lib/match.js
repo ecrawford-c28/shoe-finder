@@ -253,6 +253,14 @@ const MIN_RATED_SHOES = 8;
 // confident looking number next to thin evidence, so below this it shows nothing.
 const MIN_COUNT_TO_PUBLISH = 10;
 
+// What an NMFR Choice is worth in the ranking. Deliberately tiny: less than half
+// a category match, smaller even than the review score, so a tagged shoe wins a
+// close call between two shoes that both suit the answers and can never climb
+// into a list it does not belong in. Nobody should get a worse recommendation
+// because Ed happens to have run in something. The badge on the card is the
+// feature; this is only the tie break behind it.
+const NMFR_CHOICE_WEIGHT = 8;
+
 export function ratingStats(shoes) {
   const rated = shoes.filter(s => s.rating > 0 && s.rating_count > 0);
   if (rated.length < MIN_RATED_SHOES) return null;
@@ -484,6 +492,10 @@ export function scoreShoes(shoes, a, limit = 5, opts = {}) {
     }
 
     // --- General quality and tie breaking ----------------------------------
+    // No reason line for this one. The badge on the card already says it, and a
+    // fifth bullet claiming the shoe is good would push out one of the four
+    // reasons that actually explain the fit.
+    if (shoe.nmfr_choice) score += NMFR_CHOICE_WEIGHT;
     if (shoe.durability === 'high') score += 4;
     else if (shoe.durability === 'low' && a.purpose !== 'race_day') score -= 3;
     // Stable pseudo-random nudge so identically scored shoes do not simply fall

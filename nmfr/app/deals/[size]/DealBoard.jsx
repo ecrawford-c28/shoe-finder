@@ -1,6 +1,7 @@
 'use client';
 
 import { useState } from 'react';
+import ChoiceBadge from '../../../components/ChoiceBadge';
 
 // The deals list, as the same cards the quiz results use, with a shoe type
 // filter above them.
@@ -30,6 +31,7 @@ function DealCard({ deal, top }) {
             <img src={deal.image} alt={`${deal.brand} ${deal.model}`} loading="lazy" />
           </div>
         ) : null}
+        {deal.choice ? <ChoiceBadge /> : null}
         <div className="brand">{deal.brand}</div>
         <h3>{deal.model}</h3>
         <div className="price">

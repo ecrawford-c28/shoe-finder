@@ -6,7 +6,7 @@ import { allDealSlugs } from '../lib/deals';
 export default async function sitemap() {
   const { shoes } = await getShoes();
   const base = 'https://shoefinder.co.uk';
-  const routes = ['', '/how-it-works', '/privacy', '/terms', '/contact', '/guides', '/compare', '/deals'];
+  const routes = ['', '/how-it-works', '/nmfr-choice', '/privacy', '/terms', '/contact', '/guides', '/compare', '/deals'];
   const pages = routes.map(path => ({
     url: `${base}${path}`,
     changeFrequency: path === '' ? 'weekly' : 'monthly',

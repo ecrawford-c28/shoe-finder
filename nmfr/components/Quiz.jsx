@@ -4,6 +4,7 @@ import { useState, useMemo, useEffect, useRef } from 'react';
 import { track } from '@vercel/analytics';
 import { QUESTIONS, visibleQuestions, scoreShoes, summarise, discountInfo } from '../lib/match';
 import { priceOf, sizesOffered } from '../lib/feed';
+import ChoiceBadge from './ChoiceBadge';
 
 // Prices come from the feed as numbers. Trailing .00 reads as fake precision on
 // a price tag, so it goes.
@@ -319,6 +320,7 @@ function ShoeCard({ entry, rank, size, clearWinner, gender }) {
           Not in UK {size} at the moment. Shown because little else fits what you asked for.
         </p>
       ) : null}
+      {s.nmfr_choice ? <ChoiceBadge /> : null}
       <div className="brand">{s.brand}</div>
       <h3>{s.model}</h3>
       <div className="price">

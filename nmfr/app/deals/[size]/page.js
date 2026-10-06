@@ -95,6 +95,7 @@ export default async function DealsForSize({ params }) {
     drop: d.shoe.drop_mm || 0,
     width: widthNote(d.shoe.widths || []),
     outgoing: d.shoe.status === 'outgoing',
+    choice: Boolean(d.shoe.nmfr_choice),
     oneLiner: d.shoe.one_liner || '',
     retailer: d.shoe.retailer || 'SportsShoes',
     reviewUrl: d.shoe.review_url || '',

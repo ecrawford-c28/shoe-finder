@@ -287,6 +287,31 @@ input.text:focus { outline: none; border-color: var(--accent); }
 .card .price s { color: var(--muted); font-weight: 400; }
 .card .price .rrp-note { color: var(--muted); font-weight: 400; font-size: 13px; white-space: nowrap; }
 .card .liner { margin: 0 0 14px; }
+/* NMFR Choice. An outlined pill rather than a solid one: the solid accent is
+   already spoken for by the rank pill, and two filled lime badges on one card
+   read as decoration instead of information. */
+.choice {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  margin-bottom: 8px;
+  padding: 4px 10px 4px 8px;
+  border: 1px solid var(--accent);
+  border-radius: 999px;
+  background: var(--accent-wash);
+  color: var(--accent);
+  font-size: 12px;
+  font-weight: 700;
+  letter-spacing: 0.01em;
+  text-decoration: none;
+  line-height: 1.4;
+}
+.choice:hover { background: var(--accent); color: var(--accent-ink); }
+.choice svg {
+  width: 13px; height: 13px; flex: none;
+  fill: none; stroke: currentColor; stroke-width: 1.8;
+  stroke-linecap: round; stroke-linejoin: round;
+}
 .shoe-img {
   display: block; width: 100%; height: 170px; overflow: hidden;
   background: var(--plate); border-radius: var(--radius-plate); margin-bottom: 14px;

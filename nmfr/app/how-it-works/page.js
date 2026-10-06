@@ -116,6 +116,15 @@ export default async function How() {
         </>
       ) : null}
 
+      <h2>NMFR Choice</h2>
+      <p>
+        A few shoes carry an NMFR Choice badge, which means Not Made For Running has run in that one
+        and rates it. It is worth a small nudge in the ranking, less than half of what a single
+        matching shoe type is worth, so it settles a close call between two shoes that already suit
+        your answers and nothing more. Nobody pays for the badge. The{' '}
+        <a href="/nmfr-choice">NMFR Choice page</a> sets out what it does and does not mean.
+      </p>
+
       <h2>Where the buy links go</h2>
       <p>
         Every shoe links to SportsShoes.com, which carries the widest range of running shoe brands

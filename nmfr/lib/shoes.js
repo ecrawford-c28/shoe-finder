@@ -75,6 +75,10 @@ function rowsToShoes(rows) {
       rating: num(o.rating),
       rating_count: Math.round(num(o.rating_count)),
       one_liner: (o.one_liner || '').trim(),
+      // Ed has run in this one himself and rates it. Editorial, not bought, and
+      // absent until the sheet carries the column, which is why every default
+      // here is false rather than true.
+      nmfr_choice: truthy(o.nmfr_choice),
       status: (o.status || 'current').trim().toLowerCase(),
       // Groups a shoe with its own earlier or later versions, so the quiz never
       // offers someone the Guide 18 and the Guide 19 as two separate choices.
