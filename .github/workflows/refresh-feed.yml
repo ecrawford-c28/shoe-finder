@@ -104,6 +104,18 @@ jobs:
             nmfr/data/feed.js \
             nmfr/data/sizes.js
 
+      # Which running shoes the retailer sells that the database does not carry.
+      # Written here because the feed is already downloaded and nothing else in
+      # the day has a copy of it. The baseline file is what keeps the list to
+      # arrivals rather than six hundred shoes that were always there.
+      - name: List the running shoes we do not carry yet
+        run: |
+          python3 nmfr/scripts/new-models.py \
+            /tmp/feed.csv \
+            nmfr/running-shoes-database.csv \
+            nmfr/public/new-models.csv \
+            nmfr/data/new-models-baseline.csv
+
       - name: Refuse a result that would empty the site
         run: |
           MATCHED=$(grep -o '"matched": [0-9]*' nmfr/data/feed.js | head -1 | grep -o '[0-9]*')
@@ -123,7 +135,7 @@ jobs:
           # The database copies too, not just the feed output: a shoe added to
           # the sheet has to reach the repo or the next run matches the old
           # list all over again.
-          FILES="nmfr/data/feed.js nmfr/data/sizes.js nmfr/running-shoes-database.csv nmfr/data/fallback.js"
+          FILES="nmfr/data/feed.js nmfr/data/sizes.js nmfr/running-shoes-database.csv nmfr/data/fallback.js nmfr/public/new-models.csv nmfr/data/new-models-baseline.csv"
           if git diff --quiet -- $FILES; then
             echo "Prices, stock, sizes and the database are all unchanged. Nothing to commit."
             exit 0
