@@ -2,7 +2,6 @@ key,first_seen,baseline
 adidas adistar byd,2026-09-29,1
 adidas adizero adios pro evo 1,2026-09-29,1
 adidas adizero adios pro evo 2,2026-09-29,1
-adidas adizero adios pro evo 3,2026-09-29,1
 adidas adizero boston 12,2026-09-29,1
 adidas adizero prime x 2 strung,2026-09-29,1
 adidas adizero prime x 3 strung,2026-09-29,1
@@ -18,6 +17,7 @@ adidas response runner 2,2026-09-29,1
 adidas response super,2026-09-29,1
 adidas runfalcon 5,2026-09-29,1
 adidas runfalcon 5 tr,2026-09-29,1
+adidas supernova,2026-10-07,
 adidas supernova comfortglide,2026-09-29,1
 adidas supernova ease,2026-09-29,1
 adidas supernova ease 2,2026-09-29,1
@@ -27,7 +27,6 @@ adidas supernova rise,2026-09-29,1
 adidas supernova rise 2,2026-09-29,1
 adidas supernova solution,2026-09-29,1
 adidas supernova solution 2,2026-09-29,1
-adidas supernova stride,2026-09-29,1
 adidas supernova stride 2,2026-09-29,1
 adidas terrex agravic,2026-09-29,1
 adidas terrex agravic 4,2026-09-29,1
@@ -48,7 +47,6 @@ altra mont blanc speed,2026-09-29,1
 altra motiv flx,2026-09-29,1
 altra olympus 275,2026-09-29,1
 altra olympus 6,2026-09-29,1
-altra superior 7,2026-09-29,1
 altra timp 5 boa,2026-09-29,1
 altra torin 8,2026-09-29,1
 altra vanish carbon 2,2026-09-29,1
@@ -112,6 +110,7 @@ hoka rocket x 2,2026-09-29,1
 hoka rocket x 3,2026-09-29,1
 hoka speedgoat 6,2026-09-29,1
 hoka speedgoat 6 mid,2026-09-29,1
+hoka stinson 7,2026-10-07,
 hoka tecton x 3,2026-09-29,1
 inov8 mudclaw 300,2026-09-29,1
 inov8 mudtalon,2026-09-29,1
@@ -122,7 +121,6 @@ inov8 roclite max,2026-09-29,1
 inov8 trailfly,2026-09-29,1
 inov8 trailfly max,2026-09-29,1
 inov8 trailfly speed,2026-09-29,1
-inov8 trailfly ultra g 280,2026-09-29,1
 inov8 trailfly zero v2,2026-09-29,1
 inov8 trailtalon max,2026-09-29,1
 inov8 trailtalon speed v2,2026-09-29,1
@@ -217,6 +215,7 @@ new balance fresh foam x 880v14,2026-09-29,1
 new balance fresh foam x balos,2026-09-29,1
 new balance fresh foam x evoz st,2026-09-29,1
 new balance fresh foam x evoz v3,2026-09-29,1
+new balance fresh foam x hierro v7,2026-10-07,
 new balance fresh foam x hierro v8,2026-09-29,1
 new balance fresh foam x kaiha,2026-09-29,1
 new balance fresh foam x kaiha rd,2026-09-29,1
@@ -238,6 +237,7 @@ nike air winflo 11,2026-09-29,1
 nike air winflo 12,2026-09-29,1
 nike air zoom pegasus 41,2026-09-29,1
 nike air zoom pegasus 42,2026-09-29,1
+nike air zoom pegasus 42 rsg,2026-10-07,
 nike air zoom pegasus cm,2026-09-29,1
 nike air zoom structure 25,2026-09-29,1
 nike journey run,2026-09-29,1
@@ -246,9 +246,11 @@ nike pegasus plus,2026-09-29,1
 nike reactx pegasus 5,2026-09-29,1
 nike structure plus,2026-09-29,1
 nike terra kiger 10,2026-09-29,1
+nike vomero plus rsg,2026-10-07,
 nike winflo 11,2026-09-29,1
 nike zegama 2,2026-09-29,1
 nike zoom fly 6 glam,2026-09-29,1
+nike zoom fly 6 rsg,2026-10-07,
 nike zoomx streakfly,2026-09-29,1
 nike zoomx vaporfly next 3,2026-09-29,1
 nnormal cadi,2026-09-29,1
@@ -282,7 +284,6 @@ on on cloudrunner 3,2026-09-29,1
 on on cloudrunner 3 max,2026-09-29,1
 on on cloudsoma,2026-09-29,1
 on on cloudstratus 3,2026-09-29,1
-on on cloudsurfer,2026-09-29,1
 on on cloudsurfer 2,2026-09-29,1
 on on cloudsurfer max,2026-09-29,1
 on on cloudsurfer next,2026-09-29,1
@@ -290,6 +291,7 @@ on on cloudultra 3,2026-09-29,1
 on on cloudultra peak,2026-09-29,1
 on on cloudultra pro,2026-09-29,1
 on on cloudvista 3,2026-09-29,1
+on on lightspray cloudboom strike 2,2026-10-07,
 on on lightspray cloudmonster 3 hyper,2026-09-29,1
 puma darter pro,2026-09-29,1
 puma deviate nitro,2026-09-29,1
@@ -327,7 +329,6 @@ puma skyrocket lite 2,2026-09-29,1
 puma velocity nitro,2026-09-29,1
 puma velocity nitro 2,2026-09-29,1
 puma velocity nitro 3,2026-09-29,1
-puma velocity nitro 3 hypnotic rush,2026-09-29,1
 puma velocity nitro 4,2026-09-29,1
 puma voyage nitro 2,2026-09-29,1
 puma voyage nitro 3,2026-09-29,1
@@ -456,12 +457,14 @@ topo athletic topo terraventure 5,2026-09-29,1
 topo athletic topo ultrafly 6,2026-09-29,1
 topo athletic topo ultraventure 5,2026-09-29,1
 topo athletic topo vista,2026-09-29,1
+true motion u tech aion 3,2026-10-07,
 true motion u tech aion elements,2026-09-29,1
 true motion u tech aion next gen,2026-09-29,1
 true motion u tech nevos elements 3,2026-09-29,1
 true motion u tech vichara,2026-09-29,1
 under armour charged bandit 3,2026-09-29,1
 under armour charged bandit 3 storm protect,2026-09-29,1
+under armour charged pursuit 3,2026-10-07,
 under armour charged rogue 4,2026-09-29,1
 under armour charged rogue 5,2026-09-29,1
 under armour charged surge 4,2026-09-29,1
@@ -473,7 +476,6 @@ under armour velociti pro,2026-09-29,1
 under armour velociti pro 2,2026-09-29,1
 vibram fivefingers trailope,2026-09-29,1
 vibram fivefingers v run,2026-09-29,1
-vibram fivefingers v run retro,2026-09-29,1
 vivobarefoot primus 3 5 fg,2026-09-29,1
 vivobarefoot primus flow,2026-09-29,1
 vivobarefoot primus flow mid ii,2026-09-29,1
@@ -487,7 +489,7 @@ vj sport vj lightspeed 2,2026-09-29,1
 vj sport vj maxx2,2026-09-29,1
 vj sport vj sarva xter,2026-09-29,1
 vj sport vj spark,2026-09-29,1
-vj sport vj ultra 3,2026-09-29,1
+vj sport vj ultra 3 1,2026-10-07,
 vj sport vj xtrm2,2026-09-29,1
 walsh pb elite extreme fell,2026-09-29,1
 walsh pb elite fell,2026-09-29,1
