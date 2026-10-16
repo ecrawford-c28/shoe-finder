@@ -10,13 +10,13 @@
 // A shoe absent from here is absent from the retailer's catalogue, which
 // the site treats as unbuyable. See lib/feed.js.
 //
-// Generated: 2026-10-16T08:58:46Z
-// Matched: 218 of 227 shoes in the database.
+// Generated: 2026-10-16T09:20:51Z
+// Matched: 227 of 236 shoes in the database.
 
 const feed = {
- "generated": "2026-10-16T08:58:46Z",
- "matched": 218,
- "requested": 227,
+ "generated": "2026-10-16T09:20:51Z",
+ "matched": 227,
+ "requested": 236,
  "shoes": {
   "act13": {
    "price": 169.99,
@@ -218,6 +218,22 @@ const feed = {
    "fit": 786368,
    "womens": "adi19475",
    "wfit": 131064
+  },
+  "adi19447": {
+   "price": 109.99,
+   "sale": 98.99,
+   "sizes": 13,
+   "inStock": 13,
+   "fit": 786368
+  },
+  "adi19448": {
+   "price": 129.99,
+   "sale": null,
+   "sizes": 13,
+   "inStock": 5,
+   "fit": 231488,
+   "womens": "adi19403",
+   "wfit": 16376
   },
   "adi19450": {
    "price": 219.99,
@@ -889,6 +905,20 @@ const feed = {
    "womens": "ino2402",
    "wfit": 8184
   },
+  "ino2417": {
+   "price": 129.99,
+   "sale": 116.99,
+   "sizes": 12,
+   "inStock": 7,
+   "fit": 86976
+  },
+  "ino2423": {
+   "price": 119.99,
+   "sale": 107.99,
+   "sizes": 12,
+   "inStock": 4,
+   "fit": 295552
+  },
   "ino2490": {
    "price": 129.99,
    "sale": 116.99,
@@ -942,6 +972,13 @@ const feed = {
    "fit": 2432,
    "womens": "ino2758",
    "wfit": 248
+  },
+  "ino2766": {
+   "price": 109.99,
+   "sale": 98.99,
+   "sizes": 12,
+   "inStock": 12,
+   "fit": 393152
   },
   "mer2744": {
    "price": 154.99,
@@ -1292,6 +1329,13 @@ const feed = {
    "womens": "nik26074",
    "wfit": 16376
   },
+  "nik24591": {
+   "price": 129.99,
+   "sale": 77.99,
+   "sizes": 14,
+   "inStock": 2,
+   "fit": 48
+  },
   "nik24922": {
    "price": 164.99,
    "sale": 98.99,
@@ -1441,6 +1485,13 @@ const feed = {
    "womens": "nik26078",
    "wfit": 16368
   },
+  "nik26091": {
+   "price": 119.99,
+   "sale": null,
+   "sizes": 14,
+   "inStock": 12,
+   "fit": 384992
+  },
   "nod74": {
    "price": 289.99,
    "sale": null,
@@ -1582,6 +1633,15 @@ const feed = {
    "fit": 128,
    "womens": "pum3222",
    "wfit": 8184
+  },
+  "pum2930": {
+   "price": 149.99,
+   "sale": 89.99,
+   "sizes": 12,
+   "inStock": 1,
+   "fit": 32768,
+   "womens": "pum3223",
+   "wfit": 7440
   },
   "pum3122": {
    "price": 209.99,
@@ -1918,6 +1978,13 @@ const feed = {
    "sizes": 16,
    "inStock": 16,
    "fit": 393212
+  },
+  "und9643": {
+   "price": 124.99,
+   "sale": 99.99,
+   "sizes": 12,
+   "inStock": 11,
+   "fit": 131008
   },
   "und9687": {
    "price": 99.99,
