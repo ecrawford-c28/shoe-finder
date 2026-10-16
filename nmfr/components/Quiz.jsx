@@ -17,6 +17,7 @@ const CAT_LABEL = {
   tempo: 'Fast training',
   race: 'Race day',
   trail: 'Trail',
+  training: 'Gym and training',
 };
 
 function Intro({ onStart, onAnswerFirst, count, questions, sample, deals, guides }) {

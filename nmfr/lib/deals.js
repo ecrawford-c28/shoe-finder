@@ -100,7 +100,7 @@ function offerFor(shoe, gender, size) {
   return { listing: code, price: base.price, sale: base.sale, sizesLeft: m.in.length };
 }
 
-const CATEGORY_ORDER = ['daily_trainer', 'max_cushion', 'stability', 'tempo', 'race', 'trail'];
+const CATEGORY_ORDER = ['daily_trainer', 'max_cushion', 'stability', 'tempo', 'race', 'trail', 'training'];
 
 export const CATEGORY_LABEL = {
   daily_trainer: 'Everyday trainers',
@@ -109,6 +109,7 @@ export const CATEGORY_LABEL = {
   tempo: 'Tempo and faster',
   race: 'Race day',
   trail: 'Trail',
+  training: 'Gym and training',
 };
 
 // Discounted shoes available in one size, grouped by what the shoe is for and

@@ -23,6 +23,7 @@ export function generateMetadata({ params }) {
 const CAT = {
   daily_trainer: 'Everyday trainer', max_cushion: 'Max cushion', stability: 'Stability',
   tempo: 'Tempo', race: 'Race day', trail: 'Trail',
+  training: 'Gym and training',
 };
 
 export default async function Guide({ params }) {

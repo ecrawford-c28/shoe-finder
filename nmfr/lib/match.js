@@ -14,7 +14,8 @@ export const QUESTIONS = [
       { value: 'long_run', label: 'Training for a race', sub: 'Half, marathon, building distance' },
       { value: 'speed_work', label: 'Getting faster', sub: 'Intervals, tempo, chasing a PB' },
       { value: 'race_day', label: 'Race day only', sub: 'The fast stuff for your goal race' },
-      { value: 'walking', label: 'Walking, gym and the odd jog', sub: 'Not really running much' },
+      { value: 'training', label: 'Training and the gym', sub: 'Lifting, classes, circuits, hybrid racing' },
+      { value: 'walking', label: 'Walking and the odd jog', sub: 'Not really running much' },
     ],
   },
   {
@@ -30,6 +31,10 @@ export const QUESTIONS = [
   {
     id: 'surface',
     title: 'Where do you run?',
+    // Not asked of the gym answer. Every shoe that answer can return is an
+    // indoor shoe, so the question has no bearing on the result and only
+    // invites the contradiction of someone picking trails and the gym.
+    showIf: a => a.purpose !== 'training',
     options: [
       { value: 'road', label: 'Roads and pavements', sub: 'Streets, treadmill, parkrun' },
       { value: 'mixed', label: 'A bit of both', sub: 'Towpaths, parks, hard packed paths' },
@@ -106,6 +111,17 @@ export const QUESTIONS = [
       { value: '160', label: 'Up to £160' },
       { value: '200', label: 'Up to £200' },
       { value: '9999', label: 'Whatever it takes' },
+    ],
+  },
+  {
+    id: 'gym_split',
+    title: 'How does a typical session break down?',
+    help: 'A lifting shoe and a running shoe are built to do opposite things. This is the question that decides which way to lean.',
+    showIf: a => a.purpose === 'training',
+    options: [
+      { value: 'gym', label: 'Mostly lifting and classes', sub: 'Running is a warm up at most' },
+      { value: 'even', label: 'An even split', sub: 'Run a few kilometres, then work' },
+      { value: 'run', label: 'Mostly running, some gym', sub: 'Hybrid racing, or a run club that lifts' },
     ],
   },
   {
@@ -335,7 +351,10 @@ export function scoreShoes(shoes, a, limit = 5, opts = {}) {
       else if (isTrail) score -= 35;
       else score += 8;
     } else {
-      if (isTrail) score -= 60;
+      // No surface answer. The gym answer does not ask, and a trail shoe is as
+      // wrong on a gym floor as it is on the road, so it is ruled out just as
+      // hard rather than merely discouraged.
+      if (isTrail) score -= a.purpose === 'training' ? 200 : 60;
     }
 
     // --- Purpose -----------------------------------------------------------
@@ -345,6 +364,7 @@ export function scoreShoes(shoes, a, limit = 5, opts = {}) {
       long_run: 'Made for the long steady miles of race training',
       speed_work: 'Suits the faster sessions you said you want to do',
       race_day: 'A race day shoe, not an everyday trainer',
+      training: 'Made for gym work rather than running',
       walking: 'Comfortable for walking and gentle jogging',
     };
     if (shoe.best_for.includes(a.purpose)) {
@@ -357,12 +377,44 @@ export function scoreShoes(shoes, a, limit = 5, opts = {}) {
       long_run: ['max_cushion', 'daily_trainer', 'tempo'],
       speed_work: ['tempo', 'race'],
       race_day: ['race', 'tempo'],
+      training: ['training', 'tempo'],
       walking: ['max_cushion', 'daily_trainer', 'stability'],
     }[a.purpose] || [];
     const catIdx = purposeCategory.indexOf(shoe.category);
     if (catIdx === 0) score += 30;
     else if (catIdx > 0) score += 18 - catIdx * 4;
     else if (purposeCategory.length) score -= 18;
+
+    // --- Gym shoes ---------------------------------------------------------
+    // A flat lifting platform is not a running shoe, and a mismatched category
+    // only costs 18 points above, which is nowhere near enough to keep a Metcon
+    // out of a marathon runner's results. Same shape as the trail rule and for
+    // the same reason: this is a filter wearing a score's clothing.
+    if (shoe.category === 'training' && a.purpose !== 'training') score -= 400;
+
+    if (a.purpose === 'training') {
+      // Which half of the shelf is right comes down to the split, because the
+      // two halves are built to do opposite things. A shoe that can do both is
+      // rare enough to be worth saying out loud.
+      const runnable = shoe.best_for.includes('easy_miles') || shoe.best_for.includes('speed_work');
+      const gymReady = shoe.best_for.includes('gym') || shoe.best_for.includes('training');
+      const split = a.gym_split || 'even';
+      if (split === 'gym') {
+        if (shoe.category === 'training') { score += 45; why(10, 'Flat and stable, which is what you want under a bar'); }
+        else score -= 120;
+      } else if (split === 'run') {
+        if (shoe.category === 'training' && runnable) { score += 30; why(10, 'A gym shoe you can genuinely run in'); }
+        else if (shoe.category === 'training') score -= 60;
+        else if (gymReady && ['tempo', 'daily_trainer'].includes(shoe.category)) {
+          score += 35;
+          why(10, 'A running shoe steady enough to take into the gym');
+        }
+      } else {
+        if (shoe.category === 'training' && runnable) { score += 40; why(10, 'Copes with both halves of the session'); }
+        else if (shoe.category === 'training') score += 20;
+        else if (gymReady && shoe.category === 'tempo') { score += 20; why(9, 'Quick on the run, steady enough for the stations'); }
+      }
+    }
 
     if (a.purpose === 'race_day' && shoe.plate === 'carbon') { score += 15; why(7, 'Carbon plate, which is what you want on race day'); }
     if (a.purpose === 'speed_work' && shoe.plate !== 'none') { score += 10; why(7, 'Plated, so it rewards you for pushing the pace'); }
@@ -626,12 +678,17 @@ export function summarise(a, brandsLiked) {
     long_run: 'race training',
     speed_work: 'faster running',
     race_day: 'race day',
+    training: 'the gym',
     walking: 'walking and the odd jog',
   }[a.purpose];
   if (purposeText) bits.push(purposeText);
+  // The gym answer is never asked where it runs, so saying "roads" back to
+  // someone who came for a lifting shoe is putting words in their mouth.
   if (a.surface === 'trail') bits.push('off road');
   else if (a.surface === 'mixed') bits.push('road and paths');
-  else bits.push('roads');
+  else if (a.purpose !== 'training') bits.push('roads');
+  if (a.gym_split === 'gym') bits.push('mostly lifting');
+  else if (a.gym_split === 'run') bits.push('mostly running');
   if (a.width === 'wide') bits.push('wide feet');
   if (a.width === 'extra_wide') bits.push('very wide feet');
   if (a.width === 'narrow') bits.push('narrow feet');

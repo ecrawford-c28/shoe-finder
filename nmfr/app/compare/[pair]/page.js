@@ -17,6 +17,7 @@ const money = n => `£${Number(n).toFixed(2).replace('.00', '')}`;
 const CAT = {
   daily_trainer: 'Everyday trainer', max_cushion: 'Max cushion', stability: 'Support',
   tempo: 'Faster training', race: 'Race day', trail: 'Trail',
+  training: 'Gym and training',
 };
 const STAB = { neutral: 'Neutral', mild_support: 'Light support', stability: 'Support' };
 const widthLabel = s =>

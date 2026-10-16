@@ -34,11 +34,14 @@ CODE_RE = re.compile(r"/product/([^/?]+)")
 # Not road or trail running shoes for adults. product_type carries most of it;
 # the title carries the rest, because Nike files junior shoes under plain
 # Running and adidas files throwing shoes there too.
-PTYPE_SKIP = re.compile(r"spike|kids|junior|walking|approach", re.I)
+PTYPE_SKIP = re.compile(r"spike|kids|junior|walking|approach|weightlift|wrestling", re.I)
+# Gym and training shoes are in the database now, so they are candidates like
+# any other. Weightlifting and wrestling shoes are not: nobody doing a 5k needs
+# one, and the retailer files a dozen of them under the same heading.
 TITLE_SKIP = re.compile(
     r"\b(juniors?|kid'?s|grade school|pre school|infants?|toddlers?|throwing|spikes?|"
-    r"tennis|court|golf|cricket|football|netball|hockey|recovery|training shoes|gels?|"
-    r"socks?|insoles?)\b", re.I
+    r"tennis|court|golf|cricket|football|netball|hockey|recovery|gels?|"
+    r"socks?|insoles?|weightlift(ing)?|powerlift(ing)?|wrestling)\b", re.I
 )
 # The feed files a few things under Running > Shoes that are not running shoes,
 # a box of energy gels among them, so the title has to say shoe as well.
@@ -114,7 +117,9 @@ def scan_feed(path, db_keys, db_codes):
         for row in csv.DictReader(fh):
             rows_read += 1
             ptype = row.get("product_type") or ""
-            if not re.search(r"Running.*Shoe", ptype, re.I) or PTYPE_SKIP.search(ptype):
+            # Cross Training Shoes is a separate heading in the feed, and the
+            # gym half of the database lives there.
+            if not re.search(r"(Running|Training).*Shoe", ptype, re.I) or PTYPE_SKIP.search(ptype):
                 continue
             title = row.get("title") or ""
             if TITLE_SKIP.search(title) or not TITLE_MUST.search(title):

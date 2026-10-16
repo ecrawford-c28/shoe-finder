@@ -15,6 +15,7 @@ const nm = s => `${s.brand} ${s.model}`;
 const CAT = {
   daily_trainer: 'Everyday trainers', max_cushion: 'Max cushioned', stability: 'Support shoes',
   tempo: 'Faster training', race: 'Race day', trail: 'Trail',
+  training: 'Gym and training',
 };
 
 export default async function CompareIndex() {
