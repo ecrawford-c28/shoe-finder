@@ -49,7 +49,8 @@ TITLE_MUST = re.compile(r"\bshoes?\b", re.I)
 # Words that describe a version of a shoe rather than a different shoe.
 VARIANT = re.compile(
     r"\b(gore ?tex|gtx|lite ?show|2e|4e|2a|d width|wide fit(ting)?|narrow fit(ting)?|"
-    r"standard fit|climaproof|waterproof|se|ek|glm|ess|amp|premium|edition|"
+    r"standard fit|climaproof|waterproof|storm|se|ek|glm|ess|amp|premium|edition|"
+    r"rsg|opulent|glow in the dark|"
     r"berlin|london|tokyo|paris|amsterdam|copenhagen|new york|nyc|marathon|"
     r"keely hodgkinson|swarovski)\b",
     re.I,
@@ -71,13 +72,36 @@ def model_key(title):
     # database keeps the word and never matches the sheet's plainer model name:
     # "Nike Metcon 10 Men's Training Shoes" stays distinct from "Metcon 10" and
     # gets reported as an arrival every single day.
+    # "air zoom" is Nike's name for the cushioning, not the shoe. The sheet
+    # calls it the Pegasus 42, the feed calls it the Air Zoom Pegasus 42, and
+    # without this they are two different shoes. Stripping it on both sides
+    # keeps them one.
+    t = re.sub(r"\bair zoom\b", " ", t)
     t = re.sub(r"\b(running|training|trail|shoes?|trainers?)\b", " ", t)
     t = re.sub(r"[^a-z0-9 ]", " ", t)
     return re.sub(r"\s+", " ", t).strip()
 
 
 def base_key(title):
-    return re.sub(r"\s+", " ", VARIANT.sub(" ", model_key(title))).strip()
+    return dedupe(re.sub(r"\s+", " ", VARIANT.sub(" ", model_key(title))).strip())
+
+
+def dedupe(key):
+    """Drop a word the key already carries, keeping the first position.
+
+    The retailer repeats the brand inside the product name and the sheet does
+    not: "VJ Sport VJ Ultra 3.1" against a sheet row of VJ Sport / Ultra 3.1,
+    "On Running On Cloudultra 3" against On / Cloudultra 3. Without this they
+    are different shoes and the arrivals list reports one we already stock,
+    every morning, forever. No running shoe name repeats a word for a reason,
+    so dropping the second one is safe in a way that guessing at brand
+    prefixes is not."""
+    seen, out = set(), []
+    for word in key.split():
+        if word not in seen:
+            seen.add(word)
+            out.append(word)
+    return " ".join(out)
 
 
 def money(v):
