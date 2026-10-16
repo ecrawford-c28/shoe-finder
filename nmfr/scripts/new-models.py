@@ -49,7 +49,7 @@ TITLE_MUST = re.compile(r"\bshoes?\b", re.I)
 # Words that describe a version of a shoe rather than a different shoe.
 VARIANT = re.compile(
     r"\b(gore ?tex|gtx|lite ?show|2e|4e|2a|d width|wide fit(ting)?|narrow fit(ting)?|"
-    r"standard fit|climaproof|waterproof|se|ek|glm|ess|premium|edition|"
+    r"standard fit|climaproof|waterproof|se|ek|glm|ess|amp|premium|edition|"
     r"berlin|london|tokyo|paris|amsterdam|copenhagen|new york|nyc|marathon|"
     r"keely hodgkinson|swarovski)\b",
     re.I,
@@ -67,7 +67,11 @@ def model_key(title):
     t = re.sub(r"\bin [a-z/ ]+$", " ", t)
     t = re.sub(r"\((.*?)\)", " ", t)
     t = re.sub(r"\b(men's|women's|mens|womens|unisex)\b", " ", t)
-    t = re.sub(r"\b(running|trail|shoes?|trainers?)\b", " ", t)
+    # "training" has to go the same way as "running", or every gym shoe in the
+    # database keeps the word and never matches the sheet's plainer model name:
+    # "Nike Metcon 10 Men's Training Shoes" stays distinct from "Metcon 10" and
+    # gets reported as an arrival every single day.
+    t = re.sub(r"\b(running|training|trail|shoes?|trainers?)\b", " ", t)
     t = re.sub(r"[^a-z0-9 ]", " ", t)
     return re.sub(r"\s+", " ", t).strip()
 
