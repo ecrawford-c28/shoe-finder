@@ -10,11 +10,11 @@
 // A shoe absent from here is absent from the retailer's catalogue, which
 // the site treats as unbuyable. See lib/feed.js.
 //
-// Generated: 2026-10-24T08:50:06Z
+// Generated: 2026-10-25T09:06:28Z
 // Matched: 227 of 239 shoes in the database.
 
 const feed = {
- "generated": "2026-10-24T08:50:06Z",
+ "generated": "2026-10-25T09:06:28Z",
  "matched": 227,
  "requested": 239,
  "shoes": {
@@ -173,7 +173,7 @@ const feed = {
    "sizes": 16,
    "inStock": 13,
    "fit": 786368,
-   "womens": "adi19510",
+   "womens": "adi19044",
    "wfit": 16376
   },
   "adi19066": {
@@ -214,8 +214,8 @@ const feed = {
    "price": 109.99,
    "sale": 98.99,
    "sizes": 13,
-   "inStock": 13,
-   "fit": 786368
+   "inStock": 12,
+   "fit": 786304
   },
   "adi19448": {
    "price": 129.99,
@@ -295,7 +295,7 @@ const feed = {
    "sizes": 12,
    "inStock": 11,
    "fit": 327616,
-   "womens": "alt1066",
+   "womens": "alt1065",
    "wfit": 16376
   },
   "alt1072": {
@@ -357,7 +357,7 @@ const feed = {
    "inStock": 5,
    "fit": 496,
    "womens": "asi15903",
-   "wfit": 51200
+   "wfit": 18432
   },
   "asi15843": {
    "price": 139.99,
@@ -440,7 +440,7 @@ const feed = {
    "sizes": 14,
    "inStock": 13,
    "fit": 131056,
-   "womens": "asi16947",
+   "womens": "asi16480",
    "wfit": 16376
   },
   "asi16580": {
@@ -535,8 +535,8 @@ const feed = {
    "price": 139.99,
    "sale": null,
    "sizes": 14,
-   "inStock": 2,
-   "fit": 33280,
+   "inStock": 1,
+   "fit": 32768,
    "womens": "asi16791",
    "wfit": 16376
   },
@@ -564,7 +564,7 @@ const feed = {
    "sizes": 14,
    "inStock": 7,
    "fit": 37840,
-   "womens": "asi16944",
+   "womens": "asi16909",
    "wfit": 16376
   },
   "asi16902": {
@@ -700,7 +700,7 @@ const feed = {
    "inStock": 15,
    "fit": 1441776,
    "womens": "bro3736",
-   "wfit": 65528
+   "wfit": 49144
   },
   "bro3715": {
    "price": 240,
@@ -803,7 +803,7 @@ const feed = {
    "sizes": 15,
    "inStock": 13,
    "fit": 786368,
-   "womens": "hok3679",
+   "womens": "hok3675",
    "wfit": 16376
   },
   "hok3638": {
@@ -848,7 +848,7 @@ const feed = {
    "sizes": 15,
    "inStock": 13,
    "fit": 786368,
-   "womens": "hok3902",
+   "womens": "hok3836",
    "wfit": 16376
   },
   "hok3872": {
@@ -950,8 +950,8 @@ const feed = {
    "price": 149.99,
    "sale": 79.99,
    "sizes": 13,
-   "inStock": 10,
-   "fit": 90080,
+   "inStock": 9,
+   "fit": 24544,
    "womens": "ino2647",
    "wfit": 8184
   },
@@ -959,8 +959,8 @@ const feed = {
    "price": 164.99,
    "sale": null,
    "sizes": 11,
-   "inStock": 2,
-   "fit": 384,
+   "inStock": 1,
+   "fit": 256,
    "womens": "ino2758",
    "wfit": 120
   },
@@ -1365,8 +1365,8 @@ const feed = {
    "price": 79.99,
    "sale": 63.99,
    "sizes": 14,
-   "inStock": 5,
-   "fit": 2976,
+   "inStock": 4,
+   "fit": 928,
    "womens": "nik25779",
    "wfit": 7312
   },
@@ -1392,8 +1392,8 @@ const feed = {
    "price": 104.99,
    "sale": 83.99,
    "sizes": 14,
-   "inStock": 9,
-   "fit": 311168,
+   "inStock": 8,
+   "fit": 49024,
    "womens": "nik25194",
    "wfit": 4
   },
@@ -1473,10 +1473,10 @@ const feed = {
    "price": 174.99,
    "sale": null,
    "sizes": 14,
-   "inStock": 9,
-   "fit": 373648,
+   "inStock": 8,
+   "fit": 365456,
    "womens": "nik26243",
-   "wfit": 4088
+   "wfit": 4080
   },
   "nik26091": {
    "price": 119.99,
@@ -1552,7 +1552,7 @@ const feed = {
    "sizes": 12,
    "inStock": 11,
    "fit": 261952,
-   "womens": "onr908",
+   "womens": "onr791",
    "wfit": 16376
   },
   "onr867": {
@@ -1631,8 +1631,8 @@ const feed = {
    "price": 209.99,
    "sale": 188.99,
    "sizes": 12,
-   "inStock": 11,
-   "fit": 391104,
+   "inStock": 10,
+   "fit": 387008,
    "womens": "pum3212",
    "wfit": 8184
   },
@@ -1739,7 +1739,7 @@ const feed = {
    "sizes": 13,
    "inStock": 12,
    "fit": 655296,
-   "womens": "sal7201",
+   "womens": "sal7283",
    "wfit": 16376
   },
   "sal7280": {
@@ -1798,8 +1798,8 @@ const feed = {
    "price": 119.99,
    "sale": 107.99,
    "sizes": 12,
-   "inStock": 10,
-   "fit": 130944,
+   "inStock": 12,
+   "fit": 393152,
    "womens": "sau5613",
    "wfit": 16376
   },
@@ -1807,8 +1807,8 @@ const feed = {
    "price": 169.99,
    "sale": 152.99,
    "sizes": 12,
-   "inStock": 5,
-   "fit": 36480,
+   "inStock": 12,
+   "fit": 393152,
    "womens": "sau5704",
    "wfit": 16376
   },
@@ -1957,8 +1957,8 @@ const feed = {
    "price": 149.99,
    "sale": null,
    "sizes": 12,
-   "inStock": 11,
-   "fit": 131008,
+   "inStock": 10,
+   "fit": 65472,
    "womens": "top63",
    "wfit": 8184
   },
