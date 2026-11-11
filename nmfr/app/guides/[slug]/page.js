@@ -1,5 +1,6 @@
 import { notFound } from 'next/navigation';
 import { getShoes } from '../../../lib/shoes';
+import { FEED_GENERATED } from '../../../lib/feed.js';
 import { scoreShoes, DEFAULT_QUESTION_COUNT } from '../../../lib/match';
 import { GUIDES, guideBySlug } from '../../../lib/guides';
 
@@ -48,6 +49,20 @@ export default async function Guide({ params }) {
           name: `${p.shoe.brand} ${p.shoe.model}`,
           url: `https://shoefinder.co.uk/guides/${g.slug}`,
         })),
+      },
+      {
+        '@type': 'WebPage',
+        '@id': `https://shoefinder.co.uk/guides/${g.slug}`,
+        name: g.h1,
+        description: g.description,
+        ...(FEED_GENERATED ? { dateModified: FEED_GENERATED } : {}),
+        isPartOf: { '@type': 'WebSite', name: 'Shoe Finder', url: 'https://shoefinder.co.uk' },
+        publisher: {
+          '@type': 'Organization',
+          name: 'Not Made For Running',
+          url: 'https://shoefinder.co.uk',
+          sameAs: ['https://www.instagram.com/notmadeforrunning/'],
+        },
       },
       {
         '@type': 'FAQPage',

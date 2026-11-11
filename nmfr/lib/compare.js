@@ -87,6 +87,12 @@ const CAT = {
 };
 
 const money = n => `£${Number(n).toFixed(2).replace('.00', '')}`;
+const STAB_RANK = { neutral: 0, mild_support: 1, stability: 2 };
+const SUPPORT = {
+  stability: 'proper support',
+  mild_support: 'a light steadying element',
+  neutral: 'nothing of the sort',
+};
 const name = s => `${s.brand} ${s.model}`;
 
 // Finds the pair for a slug, returning the two shoe objects in listed order.
@@ -123,7 +129,7 @@ export function comparison(a, b) {
     const [high, low] = dd > 0 ? [a, b] : [b, a];
     points.push({
       h: 'Heel drop',
-      p: `This is the real difference. The ${name(high)} has a ${high.drop_mm}mm drop and the ${name(low)} has ${low.drop_mm}mm. A higher heel asks less of your achilles and calf and more of your knee, and a lower one does the opposite. If you get regular trouble at one of those, pick accordingly. If you get none, pick whichever is closer to what you already run in, because changing drop suddenly is the most reliable way to give yourself a new problem.`,
+      p: `This is the real difference. The ${name(high)} sits at ${high.drop_mm}mm and the ${name(low)} at ${low.drop_mm}mm. A higher heel asks less of your achilles and calf and more of your knee, and a lower one does the opposite. If you get regular trouble at one of those, pick accordingly. If you get none, pick whichever is closer to what you already run in, because changing drop suddenly is the most reliable way to give yourself a new problem.`,
     });
   } else {
     points.push({
@@ -151,12 +157,12 @@ export function comparison(a, b) {
   }
 
   if (a.stability !== b.stability) {
-    const rank = { neutral: 0, mild_support: 1, stability: 2 };
-    const [more, less] = rank[a.stability] > rank[b.stability] ? [a, b] : [b, a];
-    const label = more.stability === 'stability' ? 'proper support' : 'a light steadying element';
+    const [more, less] = STAB_RANK[a.stability] > STAB_RANK[b.stability] ? [a, b] : [b, a];
     points.push({
       h: 'Support',
-      p: `The ${name(more)} has ${label} built in and the ${name(less)} is neutral. That matters if your ankles roll inwards noticeably when you run. If they do not, support is not a bonus, it is just something you do not need underfoot.`,
+      p: less.stability === 'neutral'
+        ? `The ${name(more)} has ${SUPPORT[more.stability]} built in and the ${name(less)} is neutral. That matters if your ankles roll inwards noticeably when you run. If they do not, support is not a bonus, it is just something you do not need underfoot.`
+        : `Both have some support in them, but not the same amount. The ${name(more)} has ${SUPPORT[more.stability]} and the ${name(less)} has ${SUPPORT[less.stability]}. Neither is neutral, so if you have been told you do not need support, the shoe you want may not be on this page.`,
     });
   }
 
@@ -232,4 +238,126 @@ export function verdict(a, b) {
   if (wa !== wb) bits.push(`only the ${name(wa ? a : b)} comes in a wide fitting`);
   if (!bits.length) bits.push('they are closely matched on paper, so fit and feel will decide it');
   return bits.join(', ') + '.';
+}
+
+// Which runner each shoe suits, as one liftable sentence.
+//
+// The page's answer to "which should you buy?" is "neither, until you have
+// tried both on", which is true and is the right advice. It is also impossible
+// to quote. A model summarising this page, or a person skimming it, needs a
+// sentence that names a shoe and a condition, and the database already knows
+// the condition: it is whatever actually separates the two.
+//
+// Rules are checked in order and the first that applies wins, so both halves of
+// the sentence talk about the same difference rather than two unrelated ones.
+// Nothing here is new information, it is the comparison above in one line.
+export function suits(a, b) {
+  const wRank = s => (s.widths.includes('extra_wide') ? 2 : s.widths.includes('wide') ? 1 : 0);
+  const dRank = { low: 0, medium: 1, high: 2 };
+
+  const rules = [
+    // Width first. It is the one difference that can rule a shoe out entirely,
+    // however much somebody likes everything else about it.
+    () => {
+      if (wRank(a) === wRank(b)) return null;
+      const [wide, narrow] = wRank(a) > wRank(b) ? [a, b] : [b, a];
+      return [[wide, 'your feet are broad'], [narrow, 'standard width fits you']];
+    },
+    () => {
+      if (a.stability === b.stability) return null;
+      const [sup, less] = STAB_RANK[a.stability] > STAB_RANK[b.stability] ? [a, b] : [b, a];
+      return less.stability === 'neutral'
+        ? [[sup, 'your ankles roll inwards noticeably'], [less, 'they do not']]
+        : [[sup, 'you want the firmer steer of the two'], [less, 'you want support without much of it']];
+    },
+    () => {
+      if (Math.abs(a.drop_mm - b.drop_mm) < 2) return null;
+      const [high, low] = a.drop_mm > b.drop_mm ? [a, b] : [b, a];
+      return [[high, 'your achilles or calf gives you trouble'], [low, 'your knees are the weak spot']];
+    },
+    () => {
+      if (a.cushioning === b.cushioning) return null;
+      const rank = { firm: 0, balanced: 1, plush: 2 };
+      const [soft, hard] = rank[a.cushioning] > rank[b.cushioning] ? [a, b] : [b, a];
+      return [[soft, 'you want it soft underfoot'], [hard, 'you would rather feel the ground']];
+    },
+    () => {
+      if (a.category === b.category || Math.abs(a.weight_g - b.weight_g) < 20) return null;
+      const [light, heavy] = a.weight_g < b.weight_g ? [a, b] : [b, a];
+      return [[light, 'you are buying for faster days'], [heavy, 'this pair is doing your everyday miles']];
+    },
+    () => {
+      if (a.durability === b.durability) return null;
+      const [tough, soft] = dRank[a.durability] > dRank[b.durability] ? [a, b] : [b, a];
+      return [[tough, 'one pair does all your running'], [soft, 'you rotate between two']];
+    },
+    () => {
+      if (Math.abs(a.rrp_gbp - b.rrp_gbp) < 10) return null;
+      const [cheap, dear] = a.rrp_gbp < b.rrp_gbp ? [a, b] : [b, a];
+      return [[cheap, 'price is deciding it'], [dear, 'it is not']];
+    },
+  ];
+
+  for (const rule of rules) {
+    const hit = rule();
+    if (hit) {
+      const [[s1, w1], [s2, w2]] = hit;
+      return `the ${name(s1)} is the one to try first if ${w1}, and the ${name(s2)} if ${w2}`;
+    }
+  }
+  return `there is very little between them on paper, so whichever fits your foot better is the right answer`;
+}
+
+// The questions people actually type about a pair of shoes, answered from the
+// data. Generated rather than written, so an answer can never drift from the
+// table above it, and only asked when the data has something to say: a question
+// answered with "they are about the same" is worth nothing to anybody.
+export function faq(a, b) {
+  const out = [];
+  const A = name(a);
+  const B = name(b);
+
+  const wRank = s => (s.widths.includes('extra_wide') ? 2 : s.widths.includes('wide') ? 1 : 0);
+  if (wRank(a) !== wRank(b)) {
+    const [wide, narrow] = wRank(a) > wRank(b) ? [a, b] : [b, a];
+    out.push([
+      `Is the ${A} or the ${B} better for wide feet?`,
+      `The ${name(wide)}. It comes in ${wRank(wide) === 2 ? 'a wide and a 4E fitting' : 'a wide fitting'}, and the ${name(narrow)} is sold in standard width only. Sizing up does not make a shoe wider, it only makes it longer.`,
+    ]);
+  }
+
+  if (Math.abs(a.weight_g - b.weight_g) >= 10) {
+    const [light, heavy] = a.weight_g < b.weight_g ? [a, b] : [b, a];
+    out.push([
+      `Which is lighter, the ${A} or the ${B}?`,
+      `The ${name(light)}, at ${light.weight_g}g against ${heavy.weight_g}g in a men's UK 8. That is a difference of ${Math.round(heavy.weight_g - light.weight_g)}g.`,
+    ]);
+  }
+
+  out.push([
+    `What is the heel drop on the ${A} and the ${B}?`,
+    Math.abs(a.drop_mm - b.drop_mm) >= 2
+      ? `The ${A} sits at ${a.drop_mm}mm and the ${B} at ${b.drop_mm}mm. A higher heel asks less of the achilles and calf and more of the knee. A lower one does the opposite.`
+      : `Both are around ${a.drop_mm}mm, so moving between the two will not feel unfamiliar.`,
+  ]);
+
+  if (a.stability !== b.stability) {
+    const [sup, less] = STAB_RANK[a.stability] > STAB_RANK[b.stability] ? [a, b] : [b, a];
+    out.push([
+      `Which is better for overpronation, the ${A} or the ${B}?`,
+      less.stability === 'neutral'
+        ? `The ${name(sup)}. It has ${SUPPORT[sup.stability]} built in and the ${name(less)} is neutral. Support is worth having if your ankles roll inwards noticeably when you run, and is not an advantage if they do not.`
+        : `The ${name(sup)} is the stronger of the two, with ${SUPPORT[sup.stability]} against ${SUPPORT[less.stability]} in the ${name(less)}. Both are built for runners who need some help, so the question is how much.`,
+    ]);
+  }
+
+  const dp = Math.round(Math.abs(a.rrp_gbp - b.rrp_gbp));
+  out.push([
+    `Is the ${A} or the ${B} cheaper?`,
+    dp < 5
+      ? `They cost effectively the same at full price, ${money(a.rrp_gbp)} against ${money(b.rrp_gbp)}. Whichever is discounted on the day is the better buy.`
+      : `The ${name(a.rrp_gbp < b.rrp_gbp ? a : b)}, at ${money(Math.min(a.rrp_gbp, b.rrp_gbp))} against ${money(Math.max(a.rrp_gbp, b.rrp_gbp))} at full price. Both are discounted often, so it is worth checking the price on the day.`,
+  ]);
+
+  return out;
 }

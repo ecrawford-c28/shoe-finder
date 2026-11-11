@@ -1,6 +1,7 @@
 import { notFound } from 'next/navigation';
 import { getShoes } from '../../../lib/shoes';
-import { PAIRS, livePairSlugs, pairSlug, pairFromSlug, comparison, verdict } from '../../../lib/compare';
+import { PAIRS, livePairSlugs, pairSlug, pairFromSlug, comparison, verdict, suits, faq } from '../../../lib/compare';
+import { priceOf, FEED_GENERATED } from '../../../lib/feed.js';
 import { ratingStats, shoeFinderScore, DEFAULT_QUESTION_COUNT } from '../../../lib/match.js';
 
 export const revalidate = 300;
@@ -33,7 +34,7 @@ export async function generateMetadata({ params }) {
   const title = `${nm(a)} vs ${nm(b)}`;
   return {
     title: `${title}: which should you buy?`,
-    description: `${title} compared on heel drop, weight, width fittings and price, using the same data behind the Shoe Finder quiz. In short, ${verdict(a, b)}`,
+    description: `${title} compared on heel drop, weight, width fittings and price, using the same data behind the Shoe Finder quiz. In short, ${suits(a, b)}.`,
     alternates: { canonical: `/compare/${params.pair}` },
     openGraph: { title, url: `/compare/${params.pair}`, type: 'article' },
   };
@@ -51,9 +52,70 @@ export default async function Compare({ params }) {
     .filter(o => o.a && o.b && (o.a.category === a.category || o.b.category === a.category))
     .slice(0, 6);
 
+  const questions = faq(a, b);
+  const prices = { [a.id]: priceOf(a), [b.id]: priceOf(b) };
+
+  // Everything marked up here is on the page in words as well. The specs come
+  // from the table, the answers from the questions section, the prices from the
+  // buy blocks. A page that says one thing to a reader and another to a machine
+  // is the kind of thing that gets a site distrusted by both.
+  const product = s => ({
+    '@type': 'Product',
+    '@id': `https://shoefinder.co.uk/compare/${params.pair}#${s.id}`,
+    name: nm(s),
+    brand: { '@type': 'Brand', name: s.brand },
+    category: CAT[s.category] || s.category,
+    ...(s.image_url ? { image: s.image_url } : {}),
+    ...(s.one_liner ? { description: s.one_liner } : {}),
+    additionalProperty: [
+      ['Heel drop', `${s.drop_mm}mm`],
+      ...(s.stack_heel_mm ? [['Heel stack', `${s.stack_heel_mm}mm`]] : []),
+      ['Weight', `${s.weight_g}g`],
+      ['Support', STAB[s.stability] || s.stability],
+      ['Widths', widthLabel(s)],
+      ['Plate', s.plate === 'none' ? 'None' : s.plate],
+    ].map(([n, v]) => ({ '@type': 'PropertyValue', name: n, value: v })),
+    offers: {
+      '@type': 'Offer',
+      price: prices[s.id].now.toFixed(2),
+      priceCurrency: 'GBP',
+      availability: prices[s.id].sizesInStock
+        ? 'https://schema.org/InStock'
+        : 'https://schema.org/OutOfStock',
+      url: s.retailer_url,
+      seller: { '@type': 'Organization', name: s.retailer || 'SportsShoes' },
+    },
+  });
+
   const jsonLd = {
     '@context': 'https://schema.org',
     '@graph': [
+      {
+        '@type': 'WebPage',
+        '@id': `https://shoefinder.co.uk/compare/${params.pair}`,
+        name: `${nm(a)} vs ${nm(b)}`,
+        description: `${nm(a)} and ${nm(b)} compared on heel drop, weight, width fittings and price. In short, ${suits(a, b)}.`,
+        ...(FEED_GENERATED ? { dateModified: FEED_GENERATED } : {}),
+        isPartOf: { '@type': 'WebSite', name: 'Shoe Finder', url: 'https://shoefinder.co.uk' },
+        publisher: {
+          '@type': 'Organization',
+          name: 'Not Made For Running',
+          url: 'https://shoefinder.co.uk',
+          sameAs: ['https://www.instagram.com/notmadeforrunning/'],
+        },
+        about: [{ '@id': `https://shoefinder.co.uk/compare/${params.pair}#${a.id}` },
+                { '@id': `https://shoefinder.co.uk/compare/${params.pair}#${b.id}` }],
+      },
+      product(a),
+      product(b),
+      {
+        '@type': 'FAQPage',
+        mainEntity: questions.map(([q, ans]) => ({
+          '@type': 'Question',
+          name: q,
+          acceptedAnswer: { '@type': 'Answer', text: ans },
+        })),
+      },
       {
         '@type': 'BreadcrumbList',
         itemListElement: [
@@ -145,10 +207,22 @@ export default async function Compare({ params }) {
           page, and the two shoes above are close enough that a foot shape will separate them faster
           than a spreadsheet will.
         </p>
+        <p>
+          <strong>If you want the short answer:</strong> {`${suits(a, b)}.`} That is what the data
+          says, and it is still second to how they feel on your feet.
+        </p>
         {[a, b].map(s => (
           <div key={s.id} className="vs-pick">
             <h3>{nm(s)}</h3>
             {s.one_liner && <p>{s.one_liner}</p>}
+            <p className="meta">
+              {prices[s.id].was
+                ? `${money(prices[s.id].now)} today, down from ${money(prices[s.id].was)}`
+                : `${money(prices[s.id].now)} today`}
+              {prices[s.id].sizesInStock
+                ? ` · ${prices[s.id].sizesInStock} size${prices[s.id].sizesInStock === 1 ? '' : 's'} in stock`
+                : ' · out of stock'}
+            </p>
             <p className="guide-links">
               <a href={`/go/${s.id}`} target="_blank" rel="nofollow sponsored noopener">
                 Buy at {s.retailer || 'SportsShoes'}
@@ -165,6 +239,14 @@ export default async function Compare({ params }) {
           </div>
         ))}
 
+        <h2 id="faq">Common questions</h2>
+        {questions.map(([q, ans]) => (
+          <div key={q}>
+            <h3>{q}</h3>
+            <p>{ans}</p>
+          </div>
+        ))}
+
         <h2 id="quiz">Or let the quiz decide</h2>
         <p>
           This page compares two shoes. The <a href="/">shoe finder</a> compares all{' '}
@@ -177,6 +259,15 @@ export default async function Compare({ params }) {
             Start the quiz
           </a>
         </p>
+        {FEED_GENERATED && (
+          <p className="meta">
+            Specifications from the Shoe Finder database. Prices and stock last checked{' '}
+            {new Date(FEED_GENERATED).toLocaleDateString('en-GB', {
+              day: 'numeric', month: 'long', year: 'numeric',
+            })}
+            .
+          </p>
+        )}
       </div>
 
       <aside className="guide-side">
@@ -186,6 +277,7 @@ export default async function Compare({ params }) {
             <a href="#specs">Side by side</a>
             <a href="#differences">What the differences mean</a>
             <a href="#verdict">Which should you buy?</a>
+            <a href="#faq">Common questions</a>
           </nav>
         </div>
         <div className="side-box">

@@ -66,6 +66,23 @@ export const viewport = {
   initialScale: 1,
 };
 
+// The site wide identity. Previously the only sitewide entity was the
+// WebApplication, which describes the quiz but says nothing about who is behind
+// it. An Organization with a sameAs pointing at the Instagram account is what
+// ties the site to the channel people have actually heard of, for anything
+// trying to work out whether this source is a person or a scraper.
+const orgLd = {
+  '@context': 'https://schema.org',
+  '@type': 'Organization',
+  '@id': 'https://shoefinder.co.uk/#organisation',
+  name: 'Not Made For Running',
+  alternateName: 'Shoe Finder',
+  url: 'https://shoefinder.co.uk',
+  description:
+    'Not Made For Running is a running account that tests road and trail shoes. Shoe Finder is its free shoe recommendation tool, built on a hand maintained database of current UK running shoes.',
+  sameAs: ['https://www.instagram.com/notmadeforrunning/'],
+};
+
 const jsonLd = {
   '@context': 'https://schema.org',
   '@type': 'WebApplication',
@@ -84,6 +101,10 @@ export default function RootLayout({ children }) {
   return (
     <html lang="en-GB" className={`${display.variable} ${body.variable} ${mono.variable}`}>
       <body>
+        <script
+          type="application/ld+json"
+          dangerouslySetInnerHTML={{ __html: JSON.stringify(orgLd) }}
+        />
         <script
           type="application/ld+json"
           dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
