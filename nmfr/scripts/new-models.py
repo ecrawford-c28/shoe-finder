@@ -46,11 +46,15 @@ TITLE_SKIP = re.compile(
 # The feed files a few things under Running > Shoes that are not running shoes,
 # a box of energy gels among them, so the title has to say shoe as well.
 TITLE_MUST = re.compile(r"\bshoes?\b", re.I)
+# Used to tell a men's or unisex listing from a women's one. The database keys
+# off a men's product code, so handing over a women's code produces a row that
+# sends men to a listing that stops at a UK 9.
+WOMENS = re.compile(r"\bwomen'?s\b", re.I)
 # Words that describe a version of a shoe rather than a different shoe.
 VARIANT = re.compile(
     r"\b(gore ?tex|gtx|lite ?show|2e|4e|2a|d width|wide fit(ting)?|narrow fit(ting)?|"
     r"standard fit|climaproof|waterproof|storm|se|ek|glm|ess|amp|premium|edition|"
-    r"rsg|opulent|glow in the dark|"
+    r"rsg|opulent|glow in the dark|ekiden|pykrete|district vision|"
     r"berlin|london|tokyo|paris|amsterdam|copenhagen|new york|nyc|marathon|"
     r"keely hodgkinson|swarovski)\b",
     re.I,
@@ -77,13 +81,19 @@ def model_key(title):
     # without this they are two different shoes. Stripping it on both sides
     # keeps them one.
     t = re.sub(r"\bair zoom\b", " ", t)
-    t = re.sub(r"\b(running|training|trail|shoes?|trainers?)\b", " ", t)
+    t = re.sub(r"\b(running|training|trail|road|shoes?|trainers?)\b", " ", t)
     t = re.sub(r"[^a-z0-9 ]", " ", t)
     return re.sub(r"\s+", " ", t).strip()
 
 
 def base_key(title):
-    return dedupe(re.sub(r"\s+", " ", VARIANT.sub(" ", model_key(title))).strip())
+    key = dedupe(re.sub(r"\s+", " ", VARIANT.sub(" ", model_key(title))).strip())
+    # A collaboration is written "<shoe> x <partner>", so removing the partner
+    # leaves the x behind: "SuperComp Elite v5 x District Vision" became
+    # "... elite v5 x" and still did not match the sheet. Only a trailing x is
+    # dropped, because shoes called Mach X 3, Tecton X 4 and Skyward X 2 need
+    # theirs, and in those it is never the last word.
+    return re.sub(r"\s+x$", "", key)
 
 
 def dedupe(key):
@@ -162,9 +172,14 @@ def scan_feed(path, db_keys, db_codes):
             rec = found.setdefault(key, {
                 "brand": (row.get("brand") or "").strip(),
                 "title": clean_title(title),
-                "codes": set(), "rrp": 0.0, "lowest": None, "in_stock": 0, "image": "",
+                "codes": set(), "mens": set(), "rrp": 0.0, "lowest": None,
+                "in_stock": 0, "image": "", "mens_image": "",
             })
             rec["codes"].add(code)
+            if not WOMENS.search(title):
+                rec["mens"].add(code)
+                if not rec["mens_image"]:
+                    rec["mens_image"] = (row.get("image_link") or "").strip()
             rec["rrp"] = max(rec["rrp"], money(row.get("price")))
             sale = money(row.get("sale_price")) or money(row.get("price"))
             if sale and (rec["lowest"] is None or sale < rec["lowest"]):
@@ -211,14 +226,15 @@ def main(feed_path, db_path, out_path, baseline_path):
 
     cutoff = (today - datetime.timedelta(days=RECENT_DAYS)).isoformat()
     cols = ["first_seen", "brand", "model", "rrp", "lowest", "sizes_in_stock",
-            "product_code", "url", "image"]
+            "product_code", "url", "image", "womens_only"]
     rows = []
     if not first_run:
         for key, rec in sellable.items():
             first_seen, is_baseline = seen[key]
             if is_baseline or first_seen < cutoff:
                 continue
-            code = sorted(rec["codes"])[0]
+            # A men's or unisex listing wherever one exists.
+            code = sorted(rec["mens"] or rec["codes"])[0]
             rows.append({
                 "first_seen": seen[key][0],
                 "brand": rec["brand"],
@@ -228,7 +244,8 @@ def main(feed_path, db_path, out_path, baseline_path):
                 "sizes_in_stock": rec["in_stock"],
                 "product_code": code,
                 "url": f"https://www.sportsshoes.com/product/{code}/",
-                "image": rec["image"],
+                "image": rec["mens_image"] or rec["image"],
+                "womens_only": "" if rec["mens"] else "yes",
             })
         rows.sort(key=lambda r: (r["first_seen"], r["brand"], r["model"]), reverse=True)
 
