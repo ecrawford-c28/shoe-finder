@@ -52,6 +52,30 @@ export const PAIRS = [
   // Trail
   ['saucony-peregrine-16', 'salomon-speedcross-6'],
   ['hoka-speedgoat-7', 'saucony-peregrine-16'],
+
+  // Added Nov 2026. Comparison pages are where two thirds of organic landings
+  // arrive and they hold people two to three minutes against the homepage's
+  // one, so the list was worth extending. These were not picked by taste: the
+  // SportsShoes feed was counted by how many colourways the retailer stocks of
+  // each model, which is the closest thing to a sales ranking we can see, and
+  // these are the models near the top of it that no page covered.
+  //
+  // Each one was checked to produce at least four genuine differences before
+  // it was added. Pairs that came out alike were dropped rather than published,
+  // which is the same reason this list is hand written in the first place.
+  ['asics-gt-2000-15', 'brooks-adrenaline-gts-26'],
+  ['saucony-hurricane-26', 'brooks-adrenaline-gts-26'],
+  ['new-balance-fresh-foam-x-880v15', 'asics-gel-cumulus-28'],
+  ['on-cloudmonster-3', 'nike-vomero-18'],
+  ['on-cloudsurfer-max', 'asics-gel-nimbus-28'],
+  ['puma-magmax-nitro-2', 'hoka-bondi-9'],
+  ['adidas-adizero-boston-13', 'saucony-endorphin-speed-6'],
+  ['puma-deviate-nitro-4', 'asics-novablast-6'],
+  ['nike-alphafly-4', 'nike-zoomx-vaporfly-next-4'],
+  ['saucony-endorphin-pro-5', 'nike-zoomx-vaporfly-next-4'],
+  // Nothing covered the cheap end, where a lot of first time buyers start.
+  ['new-balance-520v9', 'brooks-revel-9'],
+  ['new-balance-fresh-foam-680v9', 'nike-winflo-12'],
 ];
 
 export const pairSlug = (a, b) => `${a}-vs-${b}`;

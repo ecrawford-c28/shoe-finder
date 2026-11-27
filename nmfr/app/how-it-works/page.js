@@ -1,5 +1,6 @@
 import { getShoes } from '../../lib/shoes';
 import { ratingStats } from '../../lib/match.js';
+import { FEED_GENERATED } from '../../lib/feed.js';
 
 export const revalidate = 300;
 
@@ -15,8 +16,30 @@ export default async function How() {
   // page never explains a number the reader cannot find anywhere on the site.
   const { shoes } = await getShoes();
   const hasScores = Boolean(ratingStats(shoes));
+
+  // This is the page anything deciding whether to trust the site will read,
+  // a person or otherwise, so it carries the provenance in words a reader can
+  // check and in markup a machine can lift: who publishes it, what it is built
+  // from, how many shoes, and when the prices were last looked at.
+  const jsonLd = {
+    '@context': 'https://schema.org',
+    '@type': 'WebPage',
+    '@id': 'https://shoefinder.co.uk/how-it-works',
+    name: 'How the shoe finder works',
+    description: `How the running shoe quiz scores ${shoes.length} shoes against your answers, where the data comes from, and why commission plays no part in it.`,
+    ...(FEED_GENERATED ? { dateModified: FEED_GENERATED } : {}),
+    isPartOf: { '@type': 'WebSite', name: 'Shoe Finder', url: 'https://shoefinder.co.uk' },
+    publisher: {
+      '@type': 'Organization',
+      name: 'Not Made For Running',
+      url: 'https://shoefinder.co.uk',
+      sameAs: ['https://www.instagram.com/notmadeforrunning/'],
+    },
+  };
+
   return (
     <main className="prose">
+      <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }} />
       <h1>How the shoe finder works</h1>
       <p>
         No black box. Here is exactly what happens when you answer the questions.
@@ -144,16 +167,67 @@ export default async function How() {
         catalogue.
       </p>
 
+      <h2 id="where-the-data-comes-from">Where the data comes from</h2>
+      <p>
+        Three sources, and it is worth knowing which is which.
+      </p>
+      <ul>
+        <li>
+          <strong>The specifications</strong> are the brand's own published figures for heel drop,
+          because that is the number on the box and in every other shop, and lab measurements from{' '}
+          <a href="https://runrepeat.com" rel="noopener noreferrer">RunRepeat</a> for stack height
+          and weight where they have tested the shoe, because a brand's weight is usually optimistic.
+          Where a figure has never been published anywhere, the shoe waits rather than going in with
+          a guess.
+        </li>
+        <li>
+          <strong>Prices and stock</strong> come from the SportsShoes product feed, refreshed every
+          night. A shoe nobody can buy in your size is not recommended to you.
+        </li>
+        <li>
+          <strong>Which shoes are in at all</strong> is a decision, not a feed. {shoes.length} shoes
+          are in the database because somebody put them there, and a nightly job lists what
+          SportsShoes has started selling that is missing, so the gaps are deliberate rather than
+          accidental.
+        </li>
+      </ul>
+
       <h2>How the data stays current</h2>
       <p>
         The shoe list lives in a spreadsheet that gets reviewed weekly. New models go in, discontinued
         ones come out, prices get checked.
       </p>
+      {FEED_GENERATED && (
+        <p className="meta">
+          {shoes.length} shoes in the database. Prices and stock last checked{' '}
+          {new Date(FEED_GENERATED).toLocaleDateString('en-GB', {
+            day: 'numeric', month: 'long', year: 'numeric',
+          })}
+          .
+        </p>
+      )}
 
       <h2>Where the money comes from</h2>
       <p>
         Buy buttons are affiliate links, so a purchase may earn a commission. Commission rates are not
         an input to the scoring. A shoe that pays nothing can and does come out top.
+      </p>
+      <p>
+        There is no advertising on the site, no email capture, and nothing is paid for. No brand or
+        retailer can buy a place in your results, raise a shoe's ranking, or have one removed.
+      </p>
+
+      <h2>Who is behind it</h2>
+      <p>
+        Shoe Finder is built and maintained by{' '}
+        <a href="https://www.instagram.com/notmadeforrunning/" rel="noopener noreferrer">
+          Not Made For Running
+        </a>
+        , a running account that tests road and trail shoes. The{' '}
+        <a href="/nmfr-choice">NMFR Choice badge</a> marks the shoes that have actually been run in.
+        Everything else in the database is assembled from the sources above rather than from personal
+        testing, which is said plainly because two hundred and fifty shoes is more than one person
+        can run in.
       </p>
     </main>
   );
