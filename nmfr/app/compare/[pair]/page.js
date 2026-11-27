@@ -2,6 +2,7 @@ import { notFound } from 'next/navigation';
 import { getShoes } from '../../../lib/shoes';
 import { PAIRS, livePairSlugs, pairSlug, pairFromSlug, comparison, verdict, suits, faq } from '../../../lib/compare';
 import { priceOf, FEED_GENERATED } from '../../../lib/feed.js';
+import BuyLink from '../../../components/BuyLink';
 import { ratingStats, shoeFinderScore, DEFAULT_QUESTION_COUNT } from '../../../lib/match.js';
 
 export const revalidate = 300;
@@ -224,9 +225,9 @@ export default async function Compare({ params }) {
                 : ' · out of stock'}
             </p>
             <p className="guide-links">
-              <a href={`/go/${s.id}`} target="_blank" rel="nofollow sponsored noopener">
+              <BuyLink shoe={s.id} href={`/go/${s.id}`} where="compare">
                 Buy at {s.retailer || 'SportsShoes'}
-              </a>
+              </BuyLink>
               {s.review_url ? (
                 <>
                   {' · '}

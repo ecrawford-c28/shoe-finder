@@ -1,6 +1,7 @@
 'use client';
 
 import { useState, useMemo, useEffect, useRef } from 'react';
+import BuyLink from './BuyLink';
 import { track } from '@vercel/analytics';
 import { QUESTIONS, visibleQuestions, scoreShoes, summarise, discountInfo } from '../lib/match';
 import { priceOf, sizesOffered } from '../lib/feed';
@@ -352,9 +353,13 @@ function ShoeCard({ entry, rank, size, clearWinner, gender }) {
         <p className="cheaper">
           Last year&apos;s <b>{entry.cheaperSibling.model}</b> is still available and usually
           discounted.{' '}
-          <a href={`/go/${entry.cheaperSibling.id}${genderParam}`} target="_blank" rel="nofollow sponsored noopener">
+          <BuyLink
+            shoe={entry.cheaperSibling.id}
+            href={`/go/${entry.cheaperSibling.id}${genderParam}`}
+            where="quiz-cheaper-sibling"
+          >
             Check the price
-          </a>
+          </BuyLink>
           .
         </p>
       ) : null}
@@ -400,9 +405,14 @@ function ShoeCard({ entry, rank, size, clearWinner, gender }) {
         {widthNote && <span>{widthNote}</span>}
         {s.plate !== 'none' && <span>{s.plate} plate</span>}
       </div>
-      <a className="btn" href={`/go/${s.id}${genderParam}`} target="_blank" rel="nofollow sponsored noopener">
+      <BuyLink
+        className="btn"
+        shoe={s.id}
+        href={`/go/${s.id}${genderParam}`}
+        where="quiz-result"
+      >
         Buy at {s.retailer || 'SportsShoes'}
-      </a>
+      </BuyLink>
       {s.review_url ? (
         <a className="review-link" href={s.review_url} target="_blank" rel="noopener noreferrer">
           Read the lab review at RunRepeat

@@ -1,6 +1,7 @@
 import { notFound } from 'next/navigation';
 import { getShoes } from '../../../lib/shoes';
 import { FEED_GENERATED } from '../../../lib/feed.js';
+import BuyLink from '../../../components/BuyLink';
 import { scoreShoes, DEFAULT_QUESTION_COUNT } from '../../../lib/match';
 import { GUIDES, guideBySlug } from '../../../lib/guides';
 
@@ -140,9 +141,9 @@ export default async function Guide({ params }) {
               </ul>
             )}
             <p className="guide-links">
-              <a href={`/go/${shoe.id}`} target="_blank" rel="nofollow sponsored noopener">
+              <BuyLink shoe={shoe.id} href={`/go/${shoe.id}`} where="guide">
                 Buy at {shoe.retailer || 'SportsShoes'}
-              </a>
+              </BuyLink>
               {shoe.review_url ? (
                 <>
                   {' · '}

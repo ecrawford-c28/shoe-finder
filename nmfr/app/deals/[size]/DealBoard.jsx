@@ -1,6 +1,7 @@
 'use client';
 
 import { useState } from 'react';
+import BuyLink from '../../../components/BuyLink';
 import ChoiceBadge from '../../../components/ChoiceBadge';
 
 // The deals list, as the same cards the quiz results use, with a shoe type
@@ -54,9 +55,9 @@ function DealCard({ deal, top }) {
           {deal.drop ? <span>{deal.drop}mm drop</span> : null}
           {deal.width ? <span>{deal.width}</span> : null}
         </div>
-        <a className="btn" href={deal.href} target="_blank" rel="nofollow sponsored noopener">
+        <BuyLink className="btn" shoe={deal.id} href={deal.href} where="deals">
           Buy at {deal.retailer}
-        </a>
+        </BuyLink>
         {deal.reviewUrl ? (
           <a
             className="review-link"
